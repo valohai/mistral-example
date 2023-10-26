@@ -1,0 +1,70 @@
+- step:
+    name: complete-finetune
+    image: sofiiavalohai/valohai-llms:v1.5
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    command:
+      - python -m pip install --upgrade pip
+      - pip install valohai-utils peft accelerate bitsandbytes torch>=1.10
+      - pip install -U transformers
+      - pip install -q -U bitsandbytes
+      - pip install -q trl xformers wandb datasets einops gradio sentencepiece
+      - pip install -q -U datasets scipy ipywidgets
+      - python mistral_finetune.py
+    inputs:
+      - name: train_data
+        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/train.csv
+      - name: test_data
+        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/test.csv
+      - name: val_data
+        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/validation.csv
+      - name: model
+        default: s3://dd-sample-bucket/mistral/model-checkpoint/*
+
+
+- step:
+    name: data-preprocess
+    image: sofiiavalohai/llms-python3.10:v2
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    command:
+      - python data-preprocess-v1.py
+    inputs:
+      - name: train_data
+        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/train.csv
+      - name: test_data
+        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/test.csv
+      - name: val_data
+        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/validation.csv
+
+
+- step:
+    name: finetune
+    image: sofiiavalohai/valohai-llms:v1.5
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    command:
+      - python -m pip install --upgrade pip
+      - pip install valohai-utils peft accelerate bitsandbytes torch>=1.10
+      - pip install -U transformers
+      - pip install -q -U bitsandbytes
+      - pip install -q trl xformers wandb datasets einops gradio sentencepiece
+      - pip install -q -U datasets scipy ipywidgets
+      - python finetune-mistral.py
+    inputs:
+      - name: model
+        default: s3://dd-sample-bucket/mistral/model-checkpoint/*
+
+- step:
+    name: inference
+    image: sofiiavalohai/valohai-llms:v1.5
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    command:
+      - python -m pip install --upgrade pip
+      - pip install valohai-utils peft accelerate bitsandbytes torch>=1.10
+      - pip install -U transformers
+      - pip install -q -U bitsandbytes
+      - pip install -q trl xformers wandb datasets einops gradio sentencepiece
+      - pip install -q -U datasets scipy ipywidgets
+      - python inference-mistral.py
+    inputs:
+      - name: model
+        default: s3://dd-sample-bucket/mistral/model-checkpoint/*
+
