@@ -9,7 +9,7 @@
       - pip install -q -U bitsandbytes
       - pip install -q trl xformers wandb datasets einops gradio sentencepiece
       - pip install -q -U datasets scipy ipywidgets
-      - python mistral_finetune.py
+      - python tests/complete_mistral_finetune.py
     inputs:
       - name: train_data
         default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/train.csv
@@ -23,10 +23,26 @@
 
 - step:
     name: data-preprocess
-    image: sofiiavalohai/llms-python3.10:v2
+    image: sofiiavalohai/valohai-llms:v1.5
     environment: staging-aws-eu-west-1-p3-2xlarge
     command:
-      - python data-preprocess-v1.py
+      - python -m pip install --upgrade pip
+      - pip install valohai-utils peft accelerate bitsandbytes torch>=1.10
+      - pip install -U transformers
+      - pip install -q -U bitsandbytes
+      - pip install -q trl xformers wandb datasets einops gradio sentencepiece
+      - pip install -q -U datasets scipy ipywidgets
+      - python data-preprocess-v1.py {parameters}
+    parameters:
+      - name: dataset
+        type: string
+        default: 'gem/viggo'
+      - name: tokenizer
+        type: string
+        default: 'mistralai/Mistral-7B-v0.1'
+      - name: model_max_length
+        type: integer
+        default: 512
     inputs:
       - name: train_data
         default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/train.csv
@@ -47,8 +63,33 @@
       - pip install -q -U bitsandbytes
       - pip install -q trl xformers wandb datasets einops gradio sentencepiece
       - pip install -q -U datasets scipy ipywidgets
-      - python finetune-mistral.py
+      - python finetune-mistral.py {parameters}
+    parameters:
+      - name: output_dir
+        type: string
+        default: "finetuned_mistral"
+      - name: model_max_length
+        type: integer
+        default: 512
+      - name: warmup_steps
+        type: integer
+        default: 5
+      - name: max_steps
+        type: integer
+        default: 10
+      - name: learning_rate
+        type: float
+        default: 2.5e-5
+      - name: do_eval
+        default: False
+
     inputs:
+      - name: train_data
+        default: dataset://viggo/dev_train
+      - name: test_data
+        default: dataset://viggo/dev_test
+      - name: val_data
+        default: dataset://viggo/dev_val
       - name: model
         default: s3://dd-sample-bucket/mistral/model-checkpoint/*
 
@@ -63,8 +104,39 @@
       - pip install -q -U bitsandbytes
       - pip install -q trl xformers wandb datasets einops gradio sentencepiece
       - pip install -q -U datasets scipy ipywidgets
-      - python inference-mistral.py
+      - python inference-mistral.py {parameters}
+    parameters:
+      - name: prompt
+        type: string
+        default: "Translate the following English text into French: 'Hello, how are you?'"
+      - name: max_tokens
+        type: integer
+        default: 50
     inputs:
-      - name: model
+      - name: model-base
         default: s3://dd-sample-bucket/mistral/model-checkpoint/*
+      - name: finetuned-checkpoint
+        default: dataset://mistral-models/best_mistral_checkpoint
+      - name: test_data
+        default: dataset://viggo/dev_test
+
+
+- pipeline:
+    name: training-pipeline
+    nodes:
+      - name: preprocess
+        type: execution
+        step: data-preprocess
+      - name: train
+        type: execution
+        step: finetune
+      - name: inference
+        type: execution
+        step: inference
+    edges:
+      - [preprocess.output.encoded_val.*, train.input.val_data]
+      - [preprocess.output.encoded_train.*, train.input.train_data]
+      - [preprocess.output.encoded_test.*, train.input.test_data]
+      - [train.output.finetuned_mistral.best_model.*, inference.input.finetuned-checkpoint]
+
 

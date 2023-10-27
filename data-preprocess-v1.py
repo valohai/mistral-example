@@ -1,4 +1,6 @@
 import argparse
+import os
+
 import valohai
 import json
 from datasets import load_dataset
@@ -6,15 +8,13 @@ from transformers import AutoTokenizer
 
 
 class DataPreprocessor:
-    def __init__(self):
-        self.train_dataset = None
-        self.eval_dataset = None
-        self.test_dataset = None
+    def __init__(self, args):
+        self.args = args
 
     def load_datasets(self):
-        self.train_dataset = load_dataset('gem/viggo', split='train')
-        self.eval_dataset = load_dataset('gem/viggo', split='validation')
-        self.test_dataset = load_dataset('gem/viggo', split='test')
+        self.train_dataset = load_dataset(self.args.dataset, split='train')
+        self.eval_dataset = load_dataset(self.args.dataset, split='validation')
+        self.test_dataset = load_dataset(self.args.dataset, split='test')
 
     def prepare_datasets(self, tokenizer, generate_and_tokenize_prompt):
         tokenized_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
@@ -32,10 +32,10 @@ class DataPreprocessor:
         ### Meaning representation:
         {data_point["meaning_representation"]}
         """
-        return tokenizer(full_prompt, truncation=True, max_length=512, padding="max_length")
+        return tokenizer(full_prompt, truncation=True, max_length=self.args.model_max_length, padding="max_length")
 
     def load_and_prepare_data(self):
-        tokenizer = AutoTokenizer.from_pretrained('mistralai/Mistral-7B-v0.1', model_max_length=512,
+        tokenizer = AutoTokenizer.from_pretrained(self.args.tokenizer, model_max_length=self.args.model_max_length,
                                                   padding_side="left", add_eos_token=True)
         tokenizer.pad_token = tokenizer.eos_token
         tokenized_train_dataset, tokenized_val_dataset = self.prepare_datasets(tokenizer, lambda
@@ -51,24 +51,35 @@ class DataPreprocessor:
         metadata = {
             "valohai.dataset-versions": [{
                 'uri': f"dataset://viggo/{project_name}_{tag}_{exec_id}",
-                'targeting_aliases': ['dev'],
+                'targeting_aliases': [f'dev_{tag}'],
                 "valohai.tags": ["dev", "mistral"],
             }]
         }
-
         save_path = valohai.outputs().path(f'encoded_{tag}')
         dataset.save_to_disk(save_path)
 
-        metadata_path = valohai.outputs().path(f'encoded_{tag}.metadata.json')
-        with open(metadata_path, 'w') as outfile:
-            json.dump(metadata, outfile)
+        for file in os.listdir(save_path):
+            metadata_path = valohai.outputs().path(f'encoded_{tag}/{file}.metadata.json')
+            with open(metadata_path, 'w') as outfile:
+                json.dump(metadata, outfile)
 
 
 if __name__ == "__main__":
-    data_preprocessor = DataPreprocessor()
+    parser = argparse.ArgumentParser(description="Prepare data")
+
+    # Add arguments based on your script's needs
+    parser.add_argument("--dataset", type=str, default='gem/viggo', help="Huggingface dataset link")
+    parser.add_argument("--tokenizer", type=str, default='mistralai/Mistral-7B-v0.1', help="Huggingface tokenizer link")
+    parser.add_argument("--model_max_length", type=int, default=512, help="Maximum length for the model")
+
+    args = parser.parse_args()
+
+    data_preprocessor = DataPreprocessor(args)
     data_preprocessor.load_datasets()
 
     tokenized_train_dataset, tokenized_val_dataset, test_dataset = data_preprocessor.load_and_prepare_data()
+    print(tokenized_train_dataset)
+    print(type(tokenized_train_dataset))
 
     data_preprocessor.save_dataset(tokenized_train_dataset, 'train')
     data_preprocessor.save_dataset(tokenized_val_dataset, 'val')
