@@ -21,13 +21,8 @@
         type: integer
         default: 512
     inputs:
-      - name: train_data
-        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/train.csv
-      - name: test_data
-        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/test.csv
-      - name: val_data
-        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/validation.csv
-
+      - name: dataset
+        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/*
 
 - step:
     name: finetune
@@ -96,7 +91,6 @@
         default: dataset://mistral-models/best_mistral_checkpoint
       - name: test_data
         default: dataset://viggo/dev_test
-
 
 - pipeline:
     name: training-pipeline

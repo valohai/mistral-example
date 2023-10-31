@@ -10,16 +10,21 @@ from transformers import AutoTokenizer
 class DataPreprocessor:
     def __init__(self, args):
         self.args = args
+        self.train_dataset, self.eval_dataset, self.test_dataset = self.load_datasets()
 
-    def load_datasets(self):
-        self.train_dataset = load_dataset(self.args.dataset, split='train')
-        self.eval_dataset = load_dataset(self.args.dataset, split='validation')
-        self.test_dataset = load_dataset(self.args.dataset, split='test')
+    @staticmethod
+    def load_datasets():
+        data_path = '/valohai/inputs/dataset/viggo.py'
+        train_dataset = load_dataset(data_path, split='train')
+        eval_dataset = load_dataset(data_path, split='validation')
+        test_dataset = load_dataset(data_path, split='test')
+
+        return train_dataset, eval_dataset, test_dataset
 
     def prepare_datasets(self, tokenizer, generate_and_tokenize_prompt):
-        tokenized_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
-        tokenized_val_dataset = self.eval_dataset.map(generate_and_tokenize_prompt)
-        return tokenized_train_dataset, tokenized_val_dataset
+        tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
+        tknzd_val_dataset = self.eval_dataset.map(generate_and_tokenize_prompt)
+        return tknzd_train_dataset, tknzd_val_dataset
 
     def generate_and_tokenize_prompt(self, data_point, tokenizer):
         full_prompt = f"""Given a target sentence construct the underlying meaning representation of the input sentence as a single function with attributes and attribute values.
@@ -42,7 +47,8 @@ class DataPreprocessor:
             data_point: self.generate_and_tokenize_prompt(data_point, tokenizer))
         return tokenized_train_dataset, tokenized_val_dataset, self.test_dataset
 
-    def save_dataset(self, dataset, tag='train'):
+    @staticmethod
+    def save_dataset(dataset, tag='train'):
         f = open('/valohai/config/execution.json')
         exec_details = json.load(f)
         project_name = exec_details['valohai.project-name'].split('/')[1]
@@ -75,7 +81,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     data_preprocessor = DataPreprocessor(args)
-    data_preprocessor.load_datasets()
 
     tokenized_train_dataset, tokenized_val_dataset, test_dataset = data_preprocessor.load_and_prepare_data()
 

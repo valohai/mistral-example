@@ -1,55 +1,10 @@
 from accelerate import FullyShardedDataParallelPlugin, Accelerator
 from torch.distributed.fsdp.fully_sharded_data_parallel import FullOptimStateDictConfig, FullStateDictConfig
-from datasets import load_dataset
 import os
-import torch
 from peft import PeftModel
-
-import datasets
-
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-
-# import valohai
-#
-# model_path = '/valohai/inputs/model/'
-#
-# model = AutoModelForCausalLM.from_pretrained(
-#     model_path,  # Mistral, same as before
-#     device_map="auto",
-#     trust_remote_code=True,
-#     use_auth_token=True
-# )
-#
-# tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-# tokenizer.pad_token = tokenizer.eos_token
-#
-# test_dataset = datasets.load_from_disk('/valohai/inputs/test_data/')
-#
-# print("Target Sentence: " + test_dataset[1]['target'])
-# print("Meaning Representation: " + test_dataset[1]['meaning_representation'] + "\n")
-#
-# eval_prompt = """Given a target sentence construct the underlying meaning representation of the input sentence as a single function with attributes and attribute values.
-# This function should describe the target string accurately and the function must be one of the following ['inform', 'request', 'give_opinion', 'confirm', 'verify_attribute', 'suggest', 'request_explanation', 'recommend', 'request_attribute'].
-# The attributes must be one of the following: ['name', 'exp_release_date', 'release_year', 'developer', 'esrb', 'rating', 'genres', 'player_perspective', 'has_multiplayer', 'platforms', 'available_on_steam', 'has_linux_release', 'has_mac_release', 'specifier']
-#
-# ### Target sentence:
-# Earlier, you stated that you didn't have strong feelings about PlayStation's Little Big Adventure. Is your opinion true for all games which don't have multiplayer?
-#
-# ### Meaning representation:
-# """
-#
-# model_input = tokenizer(eval_prompt, return_tensors="pt").to("cuda")
-#
-# model.eval()
-# with torch.no_grad():
-#     print(tokenizer.decode(model.generate(**model_input, max_new_tokens=256, pad_token_id=2)[0], skip_special_tokens=True))
-#
-#
-
-
 import argparse
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
 
 class ModelInference:
@@ -68,10 +23,14 @@ class ModelInference:
         return Accelerator(fsdp_plugin=fsdp_plugin)
 
     def load_checkpoint(self, model_path, checkpoint_path):
-        model = AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True)
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16
+        )
+        model = AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True, quantization_config=bnb_config)
         ft_model = PeftModel.from_pretrained(model, checkpoint_path)
-        # accelerator = self.setup_accelerator()
-        # ft_model = accelerator.prepare_model(ft_model)
         return ft_model.eval()
 
     def generate_response(self, prompt, max_tokens=50):
