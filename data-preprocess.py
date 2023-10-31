@@ -78,8 +78,6 @@ if __name__ == "__main__":
     data_preprocessor.load_datasets()
 
     tokenized_train_dataset, tokenized_val_dataset, test_dataset = data_preprocessor.load_and_prepare_data()
-    print(tokenized_train_dataset)
-    print(type(tokenized_train_dataset))
 
     data_preprocessor.save_dataset(tokenized_train_dataset, 'train')
     data_preprocessor.save_dataset(tokenized_val_dataset, 'val')
