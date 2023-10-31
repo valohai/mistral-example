@@ -83,7 +83,7 @@
         default: "give_opinion(name[SpellForce 3], rating[poor], genres[real-time strategy, role-playing], player_perspective[bird view])"
       - name: max_tokens
         type: integer
-        default: 50
+        default: 305
     inputs:
       - name: model-base
         default: s3://dd-sample-bucket/mistral/model-checkpoint/*
