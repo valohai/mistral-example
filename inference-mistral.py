@@ -3,6 +3,7 @@ from torch.distributed.fsdp.fully_sharded_data_parallel import FullOptimStateDic
 from datasets import load_dataset
 import os
 import torch
+from peft import PeftModel
 
 import datasets
 
@@ -52,22 +53,40 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
 class ModelInference:
-    def __init__(self, model_path, prompt):
-        self.model = AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True)
+    def __init__(self, model_path, checkpoint_path, prompt):
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, model_max_length=512, padding_side="left",
                                                        add_eos_token=True)
 
+        self.ft_model = self.load_checkpoint(model_path, checkpoint_path)
+
+    def setup_accelerator(self):
+        os.environ["WANDB_DISABLED"] = "true"
+        fsdp_plugin = FullyShardedDataParallelPlugin(
+            state_dict_config=FullStateDictConfig(offload_to_cpu=True, rank0_only=False),
+            optim_state_dict_config=FullOptimStateDictConfig(offload_to_cpu=True, rank0_only=False),
+        )
+        return Accelerator(fsdp_plugin=fsdp_plugin)
+
+    def load_checkpoint(self, model_path, checkpoint_path):
+        model = AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True)
+        ft_model = PeftModel.from_pretrained(model, checkpoint_path)
+        # accelerator = self.setup_accelerator()
+        # ft_model = accelerator.prepare_model(ft_model)
+        return ft_model.eval()
+
     def generate_response(self, prompt, max_tokens=50):
-        inputs = self.tokenizer(prompt, return_tensors="pt").to("cuda")
+        inputs = self.tokenizer(prompt, return_tensors="pt")
         with torch.no_grad():
-            outputs = self.model.generate(**inputs, max_length=max_tokens, pad_token_id=2)
+            outputs = self.ft_model.generate(**inputs, max_length=max_tokens, pad_token_id=2)
         response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         return response
 
 
 def main(args):
-    model_path = '/valohai/inputs/model/'
-    inference = ModelInference(model_path, args.prompt)
+    model_path = '/valohai/inputs/model-base/'
+    checkpoint_path = '/valohai/inputs/finetuned-checkpoint/'
+
+    inference = ModelInference(model_path, checkpoint_path, args.prompt)
     response = inference.generate_response(args.prompt, args.max_tokens)
     print("Generated Response:")
     print(response)

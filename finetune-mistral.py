@@ -7,9 +7,9 @@ import os
 import valohai
 import torch
 import datasets
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
 import transformers
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, TrainerCallback
+from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
 
 
 class FineTuner:
@@ -118,6 +118,7 @@ class FineTuner:
                 report_to=None
             ),
             data_collator=transformers.DataCollatorForLanguageModeling(self.tokenizer, mlm=False),
+            callbacks=[PrinterCallback]
         )
 
         self.model.config.use_cache = False  # silence the warnings. Please re-enable for inference!
@@ -149,6 +150,11 @@ class FineTuner:
             with open(metadata_path, 'w') as outfile:
                 json.dump(metadata, outfile)
 
+
+class PrinterCallback(TrainerCallback):
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        _ = logs.pop("total_flos", None)
+        print(json.dumps(logs))
 
 if __name__ == "__main__":
     if __name__ == "__main__":
