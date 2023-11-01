@@ -74,7 +74,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare data")
 
     # Add arguments based on your script's needs
-    parser.add_argument("--dataset", type=str, default='gem/viggo', help="Huggingface dataset link")
     parser.add_argument("--tokenizer", type=str, default='mistralai/Mistral-7B-v0.1', help="Huggingface tokenizer link")
     parser.add_argument("--model_max_length", type=int, default=512, help="Maximum length for the model")
 

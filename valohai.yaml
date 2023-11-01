@@ -11,9 +11,6 @@
       - pip install -q -U datasets scipy ipywidgets
       - python data-preprocess.py {parameters}
     parameters:
-      - name: dataset
-        type: string
-        default: 'gem/viggo'
       - name: tokenizer
         type: string
         default: 'mistralai/Mistral-7B-v0.1'
