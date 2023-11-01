@@ -99,7 +99,7 @@ This repository covers essential tasks such as data preprocessing, model fine-tu
 3. Customize the execution parameters if needed.
 4. Start the execution to run the selected step.
  
- ![alt text](https://github.com/SofiaChar/valohai-mistral-example/blob/main/screenshots/create_execution.jpeg)
+ ![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/create_execution.jpeg)
 
 </details>
 
@@ -129,7 +129,7 @@ vh execution run data-preprocess --adhoc
 4. Configure the pipeline settings.
 5. Create pipeline.
 
-![alt text](https://github.com/SofiaChar/valohai-mistral-example/blob/main/screenshots/create_pipeline.jpeg)
+![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/create_pipeline.jpeg)
 
 </details>
 
@@ -150,4 +150,4 @@ vh pipeline run training-pipeline --adhoc
 
 The completed pipeline view:
 
-![alt text](https://github.com/SofiaChar/valohai-mistral-example/blob/main/screenshots/completed_pipeline.jpeg)
+![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/completed_pipeline.jpeg)

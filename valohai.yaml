@@ -102,9 +102,9 @@
         type: execution
         step: inference
     edges:
-      - [preprocess.output.encoded_val.*, train.input.val_data]
-      - [preprocess.output.encoded_train.*, train.input.train_data]
-      - [preprocess.output.encoded_test.*, train.input.test_data]
-      - [train.output.finetuned_mistral.best_model.*, inference.input.finetuned-checkpoint]
+      - [preprocess.output.encoded_val/*, train.input.val_data]
+      - [preprocess.output.encoded_train/*, train.input.train_data]
+      - [preprocess.output.encoded_test/*, train.input.test_data]
+      - [train.output.finetuned_mistral.best_model/*, inference.input.finetuned-checkpoint]
 
 
