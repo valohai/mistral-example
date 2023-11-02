@@ -1,13 +1,8 @@
 accelerate
 bitsandbytes
 datasets
-einops
-gradio
-ipywidgets
 peft
-scipy
 sentencepiece
 torch>=1.10
 transformers
-trl
 valohai-utils
