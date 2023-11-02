@@ -156,21 +156,22 @@ class PrinterCallback(TrainerCallback):
         _ = logs.pop("total_flos", None)
         print(json.dumps(logs))
 
+
 if __name__ == "__main__":
-    if __name__ == "__main__":
-        parser = argparse.ArgumentParser(description="Fine-tune a model")
+    parser = argparse.ArgumentParser(description="Fine-tune a model")
 
-        # Add arguments based on your script's needs
-        parser.add_argument("--output_dir", type=str, default="finetuned_mistral",
-                            help="Output directory for checkpoints")
-        parser.add_argument("--model_max_length", type=int, default=512, help="Maximum length for the model")
-        parser.add_argument("--warmup_steps", type=int, default=5, help="Warmup steps")
-        parser.add_argument("--max_steps", type=int, default=10, help="Maximum training steps")
-        parser.add_argument("--learning_rate", type=float, default=2.5e-5, help="Learning rate")
-        parser.add_argument("--do_eval", action="store_true", help="Perform evaluation at the end of training")
+    # Add arguments based on your script's needs
+    # fmt: off
+    parser.add_argument("--output_dir", type=str, default="finetuned_mistral", help="Output directory for checkpoints")
+    parser.add_argument("--model_max_length", type=int, default=512, help="Maximum length for the model")
+    parser.add_argument("--warmup_steps", type=int, default=5, help="Warmup steps")
+    parser.add_argument("--max_steps", type=int, default=10, help="Maximum training steps")
+    parser.add_argument("--learning_rate", type=float, default=2.5e-5, help="Learning rate")
+    parser.add_argument("--do_eval", action="store_true", help="Perform evaluation at the end of training")
+    # fmt: on
 
-        args = parser.parse_args()
+    args = parser.parse_args()
 
-        fine_tuner = FineTuner(args)
-        fine_tuner.train()
+    fine_tuner = FineTuner(args)
+    fine_tuner.train()
 
