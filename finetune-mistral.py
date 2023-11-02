@@ -14,7 +14,16 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 class FineTuner:
     def __init__(self, args):
-        self.args = args
+        self.train_data_path = args.train_data
+        self.val_data_path = args.val_data
+        self.base_mistral_model = args.base_mistral_model or '/valohai/inputs/model/'
+        self.output_dir = args.output_dir
+        self.model_max_length = args.model_max_length
+        self.warmup_steps = args.warmup_steps
+        self.max_steps = args.max_steps
+        self.learning_rate = args.learning_rate
+        self.do_eval = args.do_eval
+
         self.setup_accelerator()
         self.setup_datasets()
         self.setup_model()
@@ -38,7 +47,7 @@ class FineTuner:
         self.tokenized_eval_dataset = datasets.load_from_disk(os.path.dirname(val_path))
 
     def setup_model(self):
-        base_model_id = self.args.base_mistral_model
+        base_model_id = self.base_mistral_model
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_use_double_quant=True,
@@ -51,7 +60,7 @@ class FineTuner:
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
             base_model_id,
-            model_max_length=self.args.model_max_length,
+            model_max_length=self.model_max_length,
             padding_side='left',
             add_eos_token=True,
         )
@@ -99,18 +108,18 @@ class FineTuner:
         self.model = self.accelerator.prepare_model(model)
 
     def train(self):
-        checkpoint_output_dir = valohai.outputs().path(self.args.output_dir)
+        checkpoint_output_dir = valohai.outputs().path(self.output_dir)
         trainer = transformers.Trainer(
             model=self.model,
             train_dataset=self.tokenized_train_dataset,
             eval_dataset=self.tokenized_eval_dataset,
             args=transformers.TrainingArguments(
                 output_dir=checkpoint_output_dir,
-                warmup_steps=self.args.warmup_steps,
+                warmup_steps=self.warmup_steps,
                 per_device_train_batch_size=2,
                 gradient_accumulation_steps=4,
-                max_steps=self.args.max_steps,
-                learning_rate=self.args.learning_rate,  # Want about 10x smaller than the Mistral learning rate
+                max_steps=self.max_steps,
+                learning_rate=self.learning_rate,  # Want about 10x smaller than the Mistral learning rate
                 logging_steps=10,
                 bf16=False,
                 tf32=False,
@@ -120,7 +129,7 @@ class FineTuner:
                 save_steps=10,  # Save checkpoints every 50 steps
                 evaluation_strategy='steps',  # Evaluate the model every logging step
                 eval_steps=50,  # Evaluate and save checkpoints every 50 steps
-                do_eval=self.args.do_eval,  # Perform evaluation at the end of training
+                do_eval=self.do_eval,  # Perform evaluation at the end of training
                 report_to=None,
             ),
             data_collator=transformers.DataCollatorForLanguageModeling(self.tokenizer, mlm=False),
@@ -166,6 +175,7 @@ class PrinterCallback(TrainerCallback):
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Fine-tune a model')
 
     # Add arguments based on your script's needs
