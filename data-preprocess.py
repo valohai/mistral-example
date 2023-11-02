@@ -7,6 +7,8 @@ import valohai
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
+from helpers import get_run_identification
+
 
 class DataPreprocessor:
     def __init__(self, args):
@@ -51,10 +53,7 @@ class DataPreprocessor:
 
     @staticmethod
     def save_dataset(dataset, tag='train'):
-        f = open('/valohai/config/execution.json')
-        exec_details = json.load(f)
-        project_name = exec_details['valohai.project-name'].split('/')[1]
-        exec_id = exec_details['valohai.execution-id']
+        project_name, exec_id = get_run_identification()
 
         metadata = {
             'valohai.dataset-versions': [
@@ -65,12 +64,12 @@ class DataPreprocessor:
                 },
             ],
         }
-        save_path = valohai.outputs().path(f'encoded_{tag}')
+        out = valohai.outputs(f'encoded_{tag}')
+        save_path = out.path('.')
         dataset.save_to_disk(save_path)
 
         for file in os.listdir(save_path):
-            metadata_path = valohai.outputs().path(f'encoded_{tag}/{file}.metadata.json')
-            with open(metadata_path, 'w') as outfile:
+            with open(out.path(f'{file}.metadata.json'), 'w') as outfile:
                 json.dump(metadata, outfile)
 
 
