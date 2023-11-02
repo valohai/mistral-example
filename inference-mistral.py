@@ -1,55 +1,62 @@
 import argparse
+import logging
 
 import torch
+import transformers
 from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+
+from helpers import get_quantization_config
+
+logger = logging.getLogger(__name__)
 
 
 class ModelInference:
-    def __init__(self, model_path, checkpoint_path, prompt):
-        self.tokenizer = AutoTokenizer.from_pretrained(
+    def __init__(self, model_path: str, checkpoint_path: str) -> None:
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             model_path,
             model_max_length=512,
             padding_side='left',
             add_eos_token=True,
         )
-
-        self.ft_model = self.load_checkpoint(model_path, checkpoint_path)
-
-    def load_checkpoint(self, model_path, checkpoint_path):
-        bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type='nf4',
-            bnb_4bit_compute_dtype=torch.bfloat16,
+        logger.info('Loading model...')
+        model = transformers.AutoModelForCausalLM.from_pretrained(
+            model_path,
+            quantization_config=get_quantization_config(),
         )
-        model = AutoModelForCausalLM.from_pretrained(model_path, quantization_config=bnb_config)
-        ft_model = PeftModel.from_pretrained(model, checkpoint_path)
-        return ft_model.eval()
+        logger.info('Creating PEFT model...')
+        self.ft_model = PeftModel.from_pretrained(model, checkpoint_path).eval()
 
-    def generate_response(self, prompt, max_tokens=50):
+    def generate_response(self, prompt: str, max_tokens: int = 50) -> str:
         inputs = self.tokenizer(prompt, return_tensors='pt')
         with torch.no_grad():
+            logger.info('Generating up to %d tokens...', max_tokens)
             outputs = self.ft_model.generate(**inputs, max_length=max_tokens, pad_token_id=2)
-        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return response
+        logger.info('Decoding...')
+        return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 
 def run(args):
-    checkpoint_path = '/valohai/inputs/finetuned-checkpoint/'
-
-    inference = ModelInference(args.base_mistral_model, checkpoint_path, args.prompt)
-    response = inference.generate_response(args.prompt, args.max_tokens)
+    inference = ModelInference(
+        model_path=args.base_mistral_model,
+        checkpoint_path=args.checkpoint_path,
+    )
+    response = inference.generate_response(
+        prompt=args.prompt,
+        max_tokens=args.max_tokens,
+    )
     print('Generated Response:')
     print(response)
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Fine-tuned Model Inference')
     # fmt: off
     parser.add_argument('--base_mistral_model', type=str, default='mistralai/Mistral-7B-v0.1', help='Base mistral from hugging face')
-    parser.add_argument('--prompt', type=str, help='Input prompt for text generation')
-    parser.add_argument('--max_tokens', type=int, default=50, help='Maximum number of tokens in the generated response')
+    parser.add_argument('--checkpoint_path', default='/valohai/inputs/finetuned-checkpoint/')
+    parser.add_argument('--max_tokens', type=int, default=305, help='Maximum number of tokens in response')
+    parser.add_argument('--model_path', default='/valohai/inputs/model-base/')
+    parser.add_argument('--prompt', type=str, required=True, help='Input prompt for text generation')
     # fmt: on
 
     args = parser.parse_args()
