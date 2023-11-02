@@ -34,7 +34,7 @@ class ModelInference:
             bnb_4bit_quant_type='nf4',
             bnb_4bit_compute_dtype=torch.bfloat16,
         )
-        model = AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True, quantization_config=bnb_config)
+        model = AutoModelForCausalLM.from_pretrained(model_path, quantization_config=bnb_config)
         ft_model = PeftModel.from_pretrained(model, checkpoint_path)
         return ft_model.eval()
 
@@ -47,10 +47,9 @@ class ModelInference:
 
 
 def main(args):
-    model_path = '/valohai/inputs/model-base/'
     checkpoint_path = '/valohai/inputs/finetuned-checkpoint/'
 
-    inference = ModelInference(model_path, checkpoint_path, args.prompt)
+    inference = ModelInference(args.base_mistral_model, checkpoint_path, args.prompt)
     response = inference.generate_response(args.prompt, args.max_tokens)
     print('Generated Response:')
     print(response)
@@ -58,6 +57,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fine-tuned Model Inference')
+    parser.add_argument("--base_mistral_model", type=str, default="mistralai/Mistral-7B-v0.1", help="Base mistral from hugging face")
     parser.add_argument('--prompt', type=str, help='Input prompt for text generation')
     parser.add_argument('--max_tokens', type=int, default=50, help='Maximum number of tokens in the generated response')
 

@@ -1,14 +1,8 @@
 - step:
     name: data-preprocess
-    image: sofiiavalohai/valohai-llms:v1.5
+    image: sofiiavalohai/llm-toolkit:v1.0
     environment: staging-aws-eu-west-1-p3-2xlarge
     command:
-      - python -m pip install --upgrade pip
-      - pip install valohai-utils peft accelerate bitsandbytes torch>=1.10
-      - pip install -U transformers
-      - pip install -q -U bitsandbytes
-      - pip install -q trl xformers wandb datasets einops gradio sentencepiece
-      - pip install -q -U datasets scipy ipywidgets
       - python data-preprocess.py {parameters}
     parameters:
       - name: tokenizer
@@ -19,21 +13,21 @@
         default: 512
     inputs:
       - name: dataset
-        default: s3://dd-sample-bucket/mistral/gem-viggo-dataset/*
+        default:
+        - s3://dd-sample-bucket/mistral/gem-viggo-dataset/viggo.py
+        - s3://dd-sample-bucket/mistral/gem-viggo-dataset/test.csv
+        - s3://dd-sample-bucket/mistral/gem-viggo-dataset/train.csv
+        - s3://dd-sample-bucket/mistral/gem-viggo-dataset/validation.csv
 
 - step:
     name: finetune
-    image: sofiiavalohai/valohai-llms:v1.5
+    image: sofiiavalohai/llm-toolkit:v1.0
     environment: staging-aws-eu-west-1-p3-2xlarge
     command:
-      - python -m pip install --upgrade pip
-      - pip install valohai-utils peft accelerate bitsandbytes torch>=1.10
-      - pip install -U transformers
-      - pip install -q -U bitsandbytes
-      - pip install -q trl xformers wandb datasets einops gradio sentencepiece
-      - pip install -q -U datasets scipy ipywidgets
       - python finetune-mistral.py {parameters}
     parameters:
+      - name: base_mistral_model
+        default: "mistralai/Mistral-7B-v0.1"
       - name: output_dir
         type: string
         default: "finetuned_mistral"
@@ -45,7 +39,7 @@
         default: 5
       - name: max_steps
         type: integer
-        default: 150
+        default: 15
       - name: learning_rate
         type: float
         default: 2.5e-5
@@ -59,22 +53,16 @@
         default: dataset://viggo/dev_test
       - name: val_data
         default: dataset://viggo/dev_val
-      - name: model
-        default: s3://dd-sample-bucket/mistral/model-checkpoint/*
 
 - step:
     name: inference
-    image: sofiiavalohai/valohai-llms:v1.5
+    image: sofiiavalohai/llm-toolkit:v1.0
     environment: staging-aws-eu-west-1-p3-2xlarge
     command:
-      - python -m pip install --upgrade pip
-      - pip install valohai-utils peft accelerate bitsandbytes torch>=1.10
-      - pip install -U transformers
-      - pip install -q -U bitsandbytes
-      - pip install -q trl xformers wandb datasets einops gradio sentencepiece
-      - pip install -q -U datasets scipy ipywidgets
       - python inference-mistral.py {parameters}
     parameters:
+      - name: base_mistral_model
+        default: "mistralai/Mistral-7B-v0.1"
       - name: prompt
         type: string
         default: "give_opinion(name[SpellForce 3], rating[poor], genres[real-time strategy, role-playing], player_perspective[bird view])"
@@ -82,8 +70,6 @@
         type: integer
         default: 305
     inputs:
-      - name: model-base
-        default: s3://dd-sample-bucket/mistral/model-checkpoint/*
       - name: finetuned-checkpoint
         default: dataset://mistral-models/best_mistral_checkpoint
       - name: test_data
@@ -106,5 +92,6 @@
       - [preprocess.output.encoded_train/*, train.input.train_data]
       - [preprocess.output.encoded_test/*, train.input.test_data]
       - [train.output.finetuned_mistral.best_model/*, inference.input.finetuned-checkpoint]
+      - [train.parameter.base_mistral_model, inference.parameter.base_mistral_model]
 
 

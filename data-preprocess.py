@@ -14,7 +14,7 @@ class DataPreprocessor:
 
     @staticmethod
     def load_datasets():
-        data_path = '/valohai/inputs/dataset/viggo.py'
+        data_path = valohai.inputs('dataset').path()
         train_dataset = load_dataset(data_path, split='train')
         eval_dataset = load_dataset(data_path, split='validation')
         test_dataset = load_dataset(data_path, split='test')

@@ -151,3 +151,10 @@ vh pipeline run training-pipeline --adhoc
 The completed pipeline view:
 
 ![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/completed_pipeline.jpeg)
+
+
+The generated response by the model looks like this:
+
+![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/inference_result.jpeg)
+
+We need to consider that the model underwent only a limited number of fine-tuning steps, so achieving satisfactory results might necessitate further experimentation with model parameters.

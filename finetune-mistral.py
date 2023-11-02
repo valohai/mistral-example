@@ -38,7 +38,7 @@ class FineTuner:
         self.tokenized_eval_dataset = datasets.load_from_disk(os.path.dirname(val_path))
 
     def setup_model(self):
-        base_model_id = '/valohai/inputs/model/'
+        base_model_id = self.args.base_mistral_model
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_use_double_quant=True,
@@ -48,7 +48,6 @@ class FineTuner:
         self.model = AutoModelForCausalLM.from_pretrained(
             base_model_id,
             quantization_config=bnb_config,
-            local_files_only=True,
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
             base_model_id,
@@ -171,6 +170,7 @@ if __name__ == '__main__':
 
     # Add arguments based on your script's needs
     # fmt: off
+    parser.add_argument("--base_mistral_model", type=str, default="mistralai/Mistral-7B-v0.1", help="Base mistral from hugging face")
     parser.add_argument("--output_dir", type=str, default="finetuned_mistral", help="Output directory for checkpoints")
     parser.add_argument("--model_max_length", type=int, default=512, help="Maximum length for the model")
     parser.add_argument("--warmup_steps", type=int, default=5, help="Warmup steps")
