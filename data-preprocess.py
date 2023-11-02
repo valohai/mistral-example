@@ -1,8 +1,8 @@
 import argparse
+import json
 import os
 
 import valohai
-import json
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
@@ -37,14 +37,20 @@ class DataPreprocessor:
         ### Meaning representation:
         {data_point["meaning_representation"]}
         """
-        return tokenizer(full_prompt, truncation=True, max_length=self.args.model_max_length, padding="max_length")
+        return tokenizer(full_prompt, truncation=True, max_length=self.args.model_max_length, padding='max_length')
 
     def load_and_prepare_data(self):
-        tokenizer = AutoTokenizer.from_pretrained(self.args.tokenizer, model_max_length=self.args.model_max_length,
-                                                  padding_side="left", add_eos_token=True)
+        tokenizer = AutoTokenizer.from_pretrained(
+            self.args.tokenizer,
+            model_max_length=self.args.model_max_length,
+            padding_side='left',
+            add_eos_token=True,
+        )
         tokenizer.pad_token = tokenizer.eos_token
-        tokenized_train_dataset, tokenized_val_dataset = self.prepare_datasets(tokenizer, lambda
-            data_point: self.generate_and_tokenize_prompt(data_point, tokenizer))
+        tokenized_train_dataset, tokenized_val_dataset = self.prepare_datasets(
+            tokenizer,
+            lambda data_point: self.generate_and_tokenize_prompt(data_point, tokenizer),
+        )
         return tokenized_train_dataset, tokenized_val_dataset, self.test_dataset
 
     @staticmethod
@@ -55,11 +61,13 @@ class DataPreprocessor:
         exec_id = exec_details['valohai.execution-id']
 
         metadata = {
-            "valohai.dataset-versions": [{
-                'uri': f"dataset://viggo/{project_name}_{tag}_{exec_id}",
-                'targeting_aliases': [f'dev_{tag}'],
-                "valohai.tags": ["dev", "mistral"],
-            }]
+            'valohai.dataset-versions': [
+                {
+                    'uri': f'dataset://viggo/{project_name}_{tag}_{exec_id}',
+                    'targeting_aliases': [f'dev_{tag}'],
+                    'valohai.tags': ['dev', 'mistral'],
+                },
+            ],
         }
         save_path = valohai.outputs().path(f'encoded_{tag}')
         dataset.save_to_disk(save_path)
@@ -70,12 +78,12 @@ class DataPreprocessor:
                 json.dump(metadata, outfile)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Prepare data")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Prepare data')
 
     # Add arguments based on your script's needs
-    parser.add_argument("--tokenizer", type=str, default='mistralai/Mistral-7B-v0.1', help="Huggingface tokenizer link")
-    parser.add_argument("--model_max_length", type=int, default=512, help="Maximum length for the model")
+    parser.add_argument('--tokenizer', type=str, default='mistralai/Mistral-7B-v0.1', help='Huggingface tokenizer link')
+    parser.add_argument('--model_max_length', type=int, default=512, help='Maximum length for the model')
 
     args = parser.parse_args()
 
