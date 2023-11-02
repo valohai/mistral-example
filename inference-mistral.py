@@ -46,7 +46,7 @@ class ModelInference:
         return response
 
 
-def main(args):
+def run(args):
     checkpoint_path = '/valohai/inputs/finetuned-checkpoint/'
 
     inference = ModelInference(args.base_mistral_model, checkpoint_path, args.prompt)
@@ -55,7 +55,7 @@ def main(args):
     print(response)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Fine-tuned Model Inference')
     # fmt: off
     parser.add_argument('--base_mistral_model', type=str, default='mistralai/Mistral-7B-v0.1', help='Base mistral from hugging face')
@@ -64,4 +64,8 @@ if __name__ == '__main__':
     # fmt: on
 
     args = parser.parse_args()
-    main(args)
+    run(args)
+
+
+if __name__ == '__main__':
+    main()

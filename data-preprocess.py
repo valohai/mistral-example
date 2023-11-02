@@ -78,7 +78,7 @@ class DataPreprocessor:
                 json.dump(metadata, outfile)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Prepare data')
 
     # Add arguments based on your script's needs
@@ -94,3 +94,7 @@ if __name__ == '__main__':
     data_preprocessor.save_dataset(tokenized_train_dataset, 'train')
     data_preprocessor.save_dataset(tokenized_val_dataset, 'val')
     data_preprocessor.save_dataset(test_dataset, 'test')
+
+
+if __name__ == '__main__':
+    main()

@@ -99,18 +99,18 @@ class FineTuner:
         self.model = self.accelerator.prepare_model(model)
 
     def train(self):
-        checkpoint_output_dir = valohai.outputs().path(args.output_dir)
+        checkpoint_output_dir = valohai.outputs().path(self.args.output_dir)
         trainer = transformers.Trainer(
             model=self.model,
             train_dataset=self.tokenized_train_dataset,
             eval_dataset=self.tokenized_eval_dataset,
             args=transformers.TrainingArguments(
                 output_dir=checkpoint_output_dir,
-                warmup_steps=args.warmup_steps,
+                warmup_steps=self.args.warmup_steps,
                 per_device_train_batch_size=2,
                 gradient_accumulation_steps=4,
-                max_steps=args.max_steps,
-                learning_rate=args.learning_rate,  # Want about 10x smaller than the Mistral learning rate
+                max_steps=self.args.max_steps,
+                learning_rate=self.args.learning_rate,  # Want about 10x smaller than the Mistral learning rate
                 logging_steps=10,
                 bf16=False,
                 tf32=False,
@@ -120,7 +120,7 @@ class FineTuner:
                 save_steps=10,  # Save checkpoints every 50 steps
                 evaluation_strategy='steps',  # Evaluate the model every logging step
                 eval_steps=50,  # Evaluate and save checkpoints every 50 steps
-                do_eval=args.do_eval,  # Perform evaluation at the end of training
+                do_eval=self.args.do_eval,  # Perform evaluation at the end of training
                 report_to=None,
             ),
             data_collator=transformers.DataCollatorForLanguageModeling(self.tokenizer, mlm=False),
@@ -165,7 +165,7 @@ class PrinterCallback(TrainerCallback):
         print(json.dumps(logs))
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Fine-tune a model')
 
     # Add arguments based on your script's needs
@@ -183,3 +183,7 @@ if __name__ == '__main__':
 
     fine_tuner = FineTuner(args)
     fine_tuner.train()
+
+
+if __name__ == '__main__':
+    main()
