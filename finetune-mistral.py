@@ -1,15 +1,18 @@
 import argparse
 import json
+import logging
 import os
 
 import datasets
-import torch
 import transformers
 import valohai
 from accelerate import Accelerator, FullyShardedDataParallelPlugin
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from torch.distributed.fsdp.fully_sharded_data_parallel import FullOptimStateDictConfig, FullStateDictConfig
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainerCallback
+
+import helpers
+
+logger = logging.getLogger(__name__)
 
 
 class FineTuner:
@@ -23,6 +26,11 @@ class FineTuner:
         self.max_steps = args.max_steps
         self.learning_rate = args.learning_rate
         self.do_eval = args.do_eval
+        self.quantization_config = helpers.get_quantization_config()
+        if self.quantization_config:
+            self.optimizer = 'paged_adamw_8bit'
+        else:
+            self.optimizer = transformers.TrainingArguments.default_optim
 
         self.setup_accelerator()
         self.setup_datasets()
@@ -38,27 +46,21 @@ class FineTuner:
         self.accelerator = Accelerator(fsdp_plugin=fsdp_plugin)
 
     def setup_datasets(self):
-        # Load your datasets here
-        train_path = valohai.inputs('train_data').path()  # returns '/valohai/inputs/train_data/train.csv'
-        val_path = valohai.inputs('val_data').path()
+        train_path = self.train_data_path or valohai.inputs('train_data').path()
+        val_path = self.val_data_path or valohai.inputs('val_data').path()
 
-        # use dirname to get /valohai/inputs/train_data
+        # use dirname to get /valohai/inputs/train_data from '/valohai/inputs/train_data/train.csv'
+        # TODO(akx): valohai-utils should have an utility to get the dirname of given inputs
         self.tokenized_train_dataset = datasets.load_from_disk(os.path.dirname(train_path))
         self.tokenized_eval_dataset = datasets.load_from_disk(os.path.dirname(val_path))
 
     def setup_model(self):
         base_model_id = self.base_mistral_model
-        bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type='nf4',
-            bnb_4bit_compute_dtype=torch.bfloat16,
-        )
-        self.model = AutoModelForCausalLM.from_pretrained(
+        self.model = transformers.AutoModelForCausalLM.from_pretrained(
             base_model_id,
-            quantization_config=bnb_config,
+            quantization_config=self.quantization_config,
         )
-        self.tokenizer = AutoTokenizer.from_pretrained(
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             base_model_id,
             model_max_length=self.model_max_length,
             padding_side='left',
@@ -123,7 +125,7 @@ class FineTuner:
                 logging_steps=10,
                 bf16=False,
                 tf32=False,
-                optim='paged_adamw_8bit',
+                optim=self.optimizer,
                 logging_dir='./logs',  # Directory for storing logs
                 save_strategy='steps',  # Save the model checkpoint every logging step
                 save_steps=10,  # Save checkpoints every 50 steps
@@ -168,7 +170,7 @@ class FineTuner:
                 json.dump(metadata, outfile)
 
 
-class PrinterCallback(TrainerCallback):
+class PrinterCallback(transformers.TrainerCallback):
     def on_log(self, args, state, control, logs=None, **kwargs):
         _ = logs.pop('total_flos', None)
         print(json.dumps(logs))
@@ -181,6 +183,8 @@ def main():
     # Add arguments based on your script's needs
     # fmt: off
     parser.add_argument("--base_mistral_model", type=str, default="mistralai/Mistral-7B-v0.1", help="Base mistral from hugging face")
+    parser.add_argument("--train_data", type=str, help="Path to the training data")
+    parser.add_argument("--val_data", type=str, help="Path to the validation data")
     parser.add_argument("--output_dir", type=str, default="finetuned_mistral", help="Output directory for checkpoints")
     parser.add_argument("--model_max_length", type=int, default=512, help="Maximum length for the model")
     parser.add_argument("--warmup_steps", type=int, default=5, help="Warmup steps")
