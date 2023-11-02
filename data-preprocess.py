@@ -19,7 +19,7 @@ class DataPreprocessor:
         self.eval_dataset = load_dataset(self.data_path, split='validation')
         self.test_dataset = load_dataset(self.data_path, split='test')
 
-    def prepare_datasets(self, tokenizer, generate_and_tokenize_prompt):
+    def prepare_datasets(self, generate_and_tokenize_prompt):
         tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
         tknzd_val_dataset = self.eval_dataset.map(generate_and_tokenize_prompt)
         return tknzd_train_dataset, tknzd_val_dataset
@@ -46,7 +46,6 @@ class DataPreprocessor:
         )
         tokenizer.pad_token = tokenizer.eos_token
         tokenized_train_dataset, tokenized_val_dataset = self.prepare_datasets(
-            tokenizer,
             lambda data_point: self.generate_and_tokenize_prompt(data_point, tokenizer),
         )
         return tokenized_train_dataset, tokenized_val_dataset, self.test_dataset
