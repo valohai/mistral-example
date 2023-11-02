@@ -1,3 +1,5 @@
-Dockerfile
+*.py[cod]
 .DS_Store
 .idea
+.valohai
+Dockerfile
