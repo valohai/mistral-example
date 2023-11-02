@@ -1,10 +1,7 @@
 import argparse
-import os
 
 import torch
-from accelerate import Accelerator, FullyShardedDataParallelPlugin
 from peft import PeftModel
-from torch.distributed.fsdp.fully_sharded_data_parallel import FullOptimStateDictConfig, FullStateDictConfig
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 
@@ -18,14 +15,6 @@ class ModelInference:
         )
 
         self.ft_model = self.load_checkpoint(model_path, checkpoint_path)
-
-    def setup_accelerator(self):
-        os.environ['WANDB_DISABLED'] = 'true'
-        fsdp_plugin = FullyShardedDataParallelPlugin(
-            state_dict_config=FullStateDictConfig(offload_to_cpu=True, rank0_only=False),
-            optim_state_dict_config=FullOptimStateDictConfig(offload_to_cpu=True, rank0_only=False),
-        )
-        return Accelerator(fsdp_plugin=fsdp_plugin)
 
     def load_checkpoint(self, model_path, checkpoint_path):
         bnb_config = BitsAndBytesConfig(
