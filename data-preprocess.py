@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import os
 
 import valohai
@@ -9,17 +10,12 @@ from transformers import AutoTokenizer
 
 class DataPreprocessor:
     def __init__(self, args):
-        self.args = args
-        self.train_dataset, self.eval_dataset, self.test_dataset = self.load_datasets()
-
-    @staticmethod
-    def load_datasets():
-        data_path = valohai.inputs('dataset').path()
-        train_dataset = load_dataset(data_path, split='train')
-        eval_dataset = load_dataset(data_path, split='validation')
-        test_dataset = load_dataset(data_path, split='test')
-
-        return train_dataset, eval_dataset, test_dataset
+        self.data_path = args.data_path or valohai.inputs('dataset').path()
+        self.model_max_length = args.model_max_length
+        self.tokenizer = args.tokenizer
+        self.train_dataset = load_dataset(self.data_path, split='train')
+        self.eval_dataset = load_dataset(self.data_path, split='validation')
+        self.test_dataset = load_dataset(self.data_path, split='test')
 
     def prepare_datasets(self, tokenizer, generate_and_tokenize_prompt):
         tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
@@ -37,12 +33,12 @@ class DataPreprocessor:
         ### Meaning representation:
         {data_point["meaning_representation"]}
         """
-        return tokenizer(full_prompt, truncation=True, max_length=self.args.model_max_length, padding='max_length')
+        return tokenizer(full_prompt, truncation=True, max_length=self.model_max_length, padding='max_length')
 
     def load_and_prepare_data(self):
         tokenizer = AutoTokenizer.from_pretrained(
-            self.args.tokenizer,
-            model_max_length=self.args.model_max_length,
+            self.tokenizer,
+            model_max_length=self.model_max_length,
             padding_side='left',
             add_eos_token=True,
         )
@@ -79,9 +75,11 @@ class DataPreprocessor:
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Prepare data')
 
     # Add arguments based on your script's needs
+    parser.add_argument('--data_path', type=str, default=None)
     parser.add_argument('--tokenizer', type=str, default='mistralai/Mistral-7B-v0.1', help='Huggingface tokenizer link')
     parser.add_argument('--model_max_length', type=int, default=512, help='Maximum length for the model')
 
