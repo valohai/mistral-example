@@ -149,10 +149,7 @@ class FineTuner:
 
     @staticmethod
     def save_valohai_metadata(save_dir):
-        f = open('/valohai/config/execution.json')
-        exec_details = json.load(f)
-        project_name = exec_details['valohai.project-name'].split('/')[1]
-        exec_id = exec_details['valohai.execution-id']
+        project_name, exec_id = helpers.get_run_identification()
 
         metadata = {
             'valohai.dataset-versions': [
