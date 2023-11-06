@@ -1,27 +1,25 @@
 import argparse
 import json
+import logging
 import os
 
 import valohai
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
+from helpers import get_run_identification
+
 
 class DataPreprocessor:
     def __init__(self, args):
-        self.args = args
-        self.train_dataset, self.eval_dataset, self.test_dataset = self.load_datasets()
+        self.data_path = args.data_path or valohai.inputs('dataset').path()
+        self.model_max_length = args.model_max_length
+        self.tokenizer = args.tokenizer
+        self.train_dataset = load_dataset(self.data_path, split='train')
+        self.eval_dataset = load_dataset(self.data_path, split='validation')
+        self.test_dataset = load_dataset(self.data_path, split='test')
 
-    @staticmethod
-    def load_datasets():
-        data_path = valohai.inputs('dataset').path()
-        train_dataset = load_dataset(data_path, split='train')
-        eval_dataset = load_dataset(data_path, split='validation')
-        test_dataset = load_dataset(data_path, split='test')
-
-        return train_dataset, eval_dataset, test_dataset
-
-    def prepare_datasets(self, tokenizer, generate_and_tokenize_prompt):
+    def prepare_datasets(self, generate_and_tokenize_prompt):
         tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
         tknzd_val_dataset = self.eval_dataset.map(generate_and_tokenize_prompt)
         return tknzd_train_dataset, tknzd_val_dataset
@@ -37,28 +35,24 @@ class DataPreprocessor:
         ### Meaning representation:
         {data_point["meaning_representation"]}
         """
-        return tokenizer(full_prompt, truncation=True, max_length=self.args.model_max_length, padding='max_length')
+        return tokenizer(full_prompt, truncation=True, max_length=self.model_max_length, padding='max_length')
 
     def load_and_prepare_data(self):
         tokenizer = AutoTokenizer.from_pretrained(
-            self.args.tokenizer,
-            model_max_length=self.args.model_max_length,
+            self.tokenizer,
+            model_max_length=self.model_max_length,
             padding_side='left',
             add_eos_token=True,
         )
         tokenizer.pad_token = tokenizer.eos_token
         tokenized_train_dataset, tokenized_val_dataset = self.prepare_datasets(
-            tokenizer,
             lambda data_point: self.generate_and_tokenize_prompt(data_point, tokenizer),
         )
         return tokenized_train_dataset, tokenized_val_dataset, self.test_dataset
 
     @staticmethod
     def save_dataset(dataset, tag='train'):
-        f = open('/valohai/config/execution.json')
-        exec_details = json.load(f)
-        project_name = exec_details['valohai.project-name'].split('/')[1]
-        exec_id = exec_details['valohai.execution-id']
+        project_name, exec_id = get_run_identification()
 
         metadata = {
             'valohai.dataset-versions': [
@@ -69,19 +63,21 @@ class DataPreprocessor:
                 },
             ],
         }
-        save_path = valohai.outputs().path(f'encoded_{tag}')
+        out = valohai.outputs(f'encoded_{tag}')
+        save_path = out.path('.')
         dataset.save_to_disk(save_path)
 
         for file in os.listdir(save_path):
-            metadata_path = valohai.outputs().path(f'encoded_{tag}/{file}.metadata.json')
-            with open(metadata_path, 'w') as outfile:
+            with open(out.path(f'{file}.metadata.json'), 'w') as outfile:
                 json.dump(metadata, outfile)
 
 
-if __name__ == '__main__':
+def main():
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Prepare data')
 
     # Add arguments based on your script's needs
+    parser.add_argument('--data_path', type=str, default=None)
     parser.add_argument('--tokenizer', type=str, default='mistralai/Mistral-7B-v0.1', help='Huggingface tokenizer link')
     parser.add_argument('--model_max_length', type=int, default=512, help='Maximum length for the model')
 
@@ -94,3 +90,7 @@ if __name__ == '__main__':
     data_preprocessor.save_dataset(tokenized_train_dataset, 'train')
     data_preprocessor.save_dataset(tokenized_val_dataset, 'val')
     data_preprocessor.save_dataset(test_dataset, 'test')
+
+
+if __name__ == '__main__':
+    main()

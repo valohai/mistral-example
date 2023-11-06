@@ -1,0 +1,8 @@
+accelerate
+bitsandbytes
+datasets
+peft
+sentencepiece
+torch>=1.10
+transformers
+valohai-utils
