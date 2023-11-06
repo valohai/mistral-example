@@ -12,12 +12,12 @@ from helpers import get_run_identification
 
 class DataPreprocessor:
     def __init__(self, args):
-        self.data_path = args.data_path or valohai.inputs('dataset').path()
+        self.data_path = args.data_path
         self.model_max_length = args.model_max_length
         self.tokenizer = args.tokenizer
-        self.train_dataset = load_dataset(self.data_path, split='train')
-        self.eval_dataset = load_dataset(self.data_path, split='validation')
-        self.test_dataset = load_dataset(self.data_path, split='test')
+        self.train_dataset = load_dataset('csv', data_files=valohai.inputs('dataset').path('train.csv'))
+        self.eval_dataset = load_dataset('csv', data_files=valohai.inputs('dataset').path('validation.csv'))
+        self.test_dataset = load_dataset('csv', data_files=valohai.inputs('dataset').path('test.csv'))
 
     def prepare_datasets(self, generate_and_tokenize_prompt):
         tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
@@ -30,10 +30,10 @@ class DataPreprocessor:
         The attributes must be one of the following: ['name', 'exp_release_date', 'release_year', 'developer', 'esrb', 'rating', 'genres', 'player_perspective', 'has_multiplayer', 'platforms', 'available_on_steam', 'has_linux_release', 'has_mac_release', 'specifier']
 
         ### Target sentence:
-        {data_point["target"]}
+        {data_point["ref"]}
 
         ### Meaning representation:
-        {data_point["meaning_representation"]}
+        {data_point["mr"]}
         """
         return tokenizer(full_prompt, truncation=True, max_length=self.model_max_length, padding='max_length')
 
