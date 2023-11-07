@@ -1,6 +1,6 @@
 - step:
     name: data-preprocess
-    image: sofiiavalohai/llm-toolkit:v1.0
+    image: valohai/llm-toolkit:0.1
     environment: staging-aws-eu-west-1-p3-2xlarge
     command:
       - pip install -r requirements.in
@@ -15,14 +15,13 @@
     inputs:
       - name: dataset
         default:
-        - s3://dd-sample-bucket/mistral/gem-viggo-dataset/viggo.py
         - s3://dd-sample-bucket/mistral/gem-viggo-dataset/test.csv
         - s3://dd-sample-bucket/mistral/gem-viggo-dataset/train.csv
         - s3://dd-sample-bucket/mistral/gem-viggo-dataset/validation.csv
 
 - step:
     name: finetune
-    image: sofiiavalohai/llm-toolkit:v1.0
+    image: valohai/llm-toolkit:0.1
     environment: staging-aws-eu-west-1-p3-2xlarge
     command:
       - pip install -r requirements.in
@@ -41,7 +40,7 @@
         default: 5
       - name: max_steps
         type: integer
-        default: 15
+        default: 128
       - name: learning_rate
         type: float
         default: 2.5e-5
@@ -58,7 +57,7 @@
 
 - step:
     name: inference
-    image: sofiiavalohai/llm-toolkit:v1.0
+    image: valohai/llm-toolkit:0.1
     environment: staging-aws-eu-west-1-p3-2xlarge
     command:
       - pip install -r requirements.in
@@ -68,15 +67,13 @@
         default: "mistralai/Mistral-7B-v0.1"
       - name: prompt
         type: string
-        default: "give_opinion(name[SpellForce 3], rating[poor], genres[real-time strategy, role-playing], player_perspective[bird view])"
+        default: "You mean Tony Hawk's Pro Skater 3, the 2001 sports game?"
       - name: max_tokens
         type: integer
-        default: 305
+        default: 150
     inputs:
       - name: finetuned-checkpoint
         default: dataset://mistral-models/best_mistral_checkpoint
-      - name: test_data
-        default: dataset://viggo/dev_test
 
 - pipeline:
     name: training-pipeline
