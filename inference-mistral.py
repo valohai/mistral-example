@@ -3,7 +3,6 @@ import logging
 
 import torch
 import transformers
-import datasets
 from peft import PeftModel
 
 from helpers import get_quantization_config
@@ -64,12 +63,11 @@ def main():
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Fine-tuned Model Inference')
     # fmt: off
-    parser.add_argument('--base_mistral_model', type=str, default='mistralai/Mistral-7B-v0.1',
-                        help='Base mistral from hugging face')
+    parser.add_argument('--base_mistral_model', type=str, default='mistralai/Mistral-7B-v0.1', help='Base mistral from hugging face')
     parser.add_argument('--checkpoint_path', default='/valohai/inputs/finetuned-checkpoint/')
     parser.add_argument('--max_tokens', type=int, default=305, help='Maximum number of tokens in response')
     parser.add_argument('--model_path', default='/valohai/inputs/model-base/')
-    parser.add_argument('--prompt', type=str, help='Input prompt for text generation')
+    parser.add_argument('--prompt', type=str, required=True, help='Input prompt for text generation')
     # fmt: on
 
     args = parser.parse_args()
