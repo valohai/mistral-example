@@ -9,15 +9,29 @@ from transformers import AutoTokenizer
 
 from helpers import get_run_identification
 
+logger = logging.getLogger(__name__)
+
 
 class DataPreprocessor:
     def __init__(self, args):
         self.data_path = args.data_path or valohai.inputs('dataset').path()
         self.model_max_length = args.model_max_length
         self.tokenizer = args.tokenizer
-        self.train_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'train.csv'))
-        self.eval_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'validation.csv'))
-        self.test_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'test.csv'))
+
+        if os.path.isdir(self.data_path):
+            logger.info('Loading dataset from local path %r', self.data_path)
+            self.train_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'train.csv'))
+            self.eval_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'validation.csv'))
+            self.test_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'test.csv'))
+            self.target_key = 'ref'
+            self.meaning_key = 'mr'
+        else:
+            logger.info('Loading dataset %r from Huggingface', self.data_path)
+            self.train_dataset = load_dataset(self.data_path, split='train')
+            self.eval_dataset = load_dataset(self.data_path, split='validation')
+            self.test_dataset = load_dataset(self.data_path, split='test')
+            self.target_key = 'target'
+            self.meaning_key = 'meaning_representation'
 
     def prepare_datasets(self, generate_and_tokenize_prompt):
         tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
@@ -30,10 +44,10 @@ class DataPreprocessor:
         The attributes must be one of the following: ['name', 'exp_release_date', 'release_year', 'developer', 'esrb', 'rating', 'genres', 'player_perspective', 'has_multiplayer', 'platforms', 'available_on_steam', 'has_linux_release', 'has_mac_release', 'specifier']
 
         ### Target sentence:
-        {data_point["ref"]}
+        {data_point[self.target_key]}
 
         ### Meaning representation:
-        {data_point["mr"]}
+        {data_point[self.meaning_key]}
         """
         return tokenizer(full_prompt, truncation=True, max_length=self.model_max_length, padding='max_length')
 
