@@ -15,9 +15,17 @@ class DataPreprocessor:
         self.data_path = args.data_path or os.path.dirname(valohai.inputs('dataset').path())
         self.model_max_length = args.model_max_length
         self.tokenizer = args.tokenizer
-        self.train_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'train.csv'))
-        self.eval_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'validation.csv'))
-        self.test_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'test.csv'))
+        dataset = load_dataset(
+            'csv',
+            data_files={
+                'train': os.path.join(self.data_path, 'train.csv'),
+                'val': os.path.join(self.data_path, 'validation.csv'),
+                'test': os.path.join(self.data_path, 'test.csv'),
+            },
+        )
+        self.train_dataset = dataset['train']
+        self.eval_dataset = dataset['val']
+        self.test_dataset = dataset['test']
 
     def prepare_datasets(self, generate_and_tokenize_prompt):
         tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
