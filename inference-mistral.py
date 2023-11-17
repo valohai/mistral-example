@@ -32,18 +32,13 @@ class ModelInference:
             logger.info('Generating up to %d tokens...', max_tokens)
             outputs = self.ft_model.generate(**inputs, max_length=max_tokens, pad_token_id=2)
         logger.info('Decoding...')
-        return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return self.postprocess(self.tokenizer.decode(outputs[0], skip_special_tokens=True))
 
     def prepare_prompt(self, prompt):
-        test_prompt = f"""Given a target sentence construct the underlying meaning representation of the input sentence as a single function with attributes and attribute values.
-        This function should describe the target string accurately and the function must be one of the following ['inform', 'request', 'give_opinion', 'confirm', 'verify_attribute', 'suggest', 'request_explanation', 'recommend', 'request_attribute'].
-        The attributes must be one of the following: ['name', 'exp_release_date', 'release_year', 'developer', 'esrb', 'rating', 'genres', 'player_perspective', 'has_multiplayer', 'platforms', 'available_on_steam', 'has_linux_release', 'has_mac_release', 'specifier']
+        return self.tokenizer(prompt, return_tensors='pt')
 
-        ### Target sentence:
-            {prompt}
-        ### Meaning representation:
-        """
-        return self.tokenizer(test_prompt, return_tensors='pt')
+    def postprocess(self, original_string):
+        return original_string.strip()
 
 
 def run(args):
