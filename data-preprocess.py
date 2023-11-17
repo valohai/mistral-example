@@ -33,10 +33,7 @@ class DataPreprocessor:
         return tknzd_train_dataset, tknzd_val_dataset
 
     def generate_and_tokenize_prompt(self, data_point, tokenizer):
-        full_prompt = f"""Given a target sentence construct the underlying meaning representation of the input sentence as a single function with attributes and attribute values.
-        This function should describe the target string accurately and the function must be one of the following ['inform', 'request', 'give_opinion', 'confirm', 'verify_attribute', 'suggest', 'request_explanation', 'recommend', 'request_attribute'].
-        The attributes must be one of the following: ['name', 'exp_release_date', 'release_year', 'developer', 'esrb', 'rating', 'genres', 'player_perspective', 'has_multiplayer', 'platforms', 'available_on_steam', 'has_linux_release', 'has_mac_release', 'specifier']
-
+        full_prompt = f"""Given a meaning representation generate a target sentence that utilizes the attributes and attribute values given. The sentence should use all the information provided in the meaning representation.
         ### Target sentence:
         {data_point["ref"]}
 
