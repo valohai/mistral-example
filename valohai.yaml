@@ -1,7 +1,7 @@
 - step:
     name: data-preprocess
     image: valohai/llm-toolkit:0.1
-    environment: staging-aws-eu-west-1-p3-2xlarge
+    environment: trial2023-g4dn-xlarge
     command:
       - pip install -r requirements.in
       - python data-preprocess.py {parameters}
@@ -22,7 +22,7 @@
 - step:
     name: finetune
     image: valohai/llm-toolkit:0.1
-    environment: staging-aws-eu-west-1-p3-2xlarge
+    environment: trial2023-g4dn-xlarge
     command:
       - pip install -r requirements.in
       - python finetune-mistral.py {parameters}
@@ -58,7 +58,7 @@
 - step:
     name: inference
     image: valohai/llm-toolkit:0.1
-    environment: staging-aws-eu-west-1-p3-2xlarge
+    environment: trial2023-g4dn-xlarge
     command:
       - pip install -r requirements.in
       - python inference-mistral.py {parameters}
