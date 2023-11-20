@@ -39,7 +39,7 @@ class ModelInference:
 
     def postprocess(self, original_string):
         return original_string.strip()
-        
+
 
 def run(args):
     inference = ModelInference(
