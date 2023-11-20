@@ -128,9 +128,9 @@ class FineTuner:
                 optim=self.optimizer,
                 logging_dir='./logs',  # Directory for storing logs
                 save_strategy='steps',  # Save the model checkpoint every logging step
-                save_steps=50,  # Save checkpoints every 50 steps
+                save_steps=10,  # Save checkpoints every 10 steps
                 evaluation_strategy='steps',  # Evaluate the model every logging step
-                eval_steps=50,  # Evaluate and save checkpoints every 50 steps
+                eval_steps=17,  # Evaluate and save checkpoints every 17 steps
                 do_eval=self.do_eval,  # Perform evaluation at the end of training
                 report_to=None,
             ),

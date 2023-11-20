@@ -12,12 +12,20 @@ from helpers import get_run_identification
 
 class DataPreprocessor:
     def __init__(self, args):
-        self.data_path = args.data_path or valohai.inputs('dataset').path()
+        self.data_path = args.data_path or os.path.dirname(valohai.inputs('dataset').path())
         self.model_max_length = args.model_max_length
         self.tokenizer = args.tokenizer
-        self.train_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'train.csv'))
-        self.eval_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'validation.csv'))
-        self.test_dataset = load_dataset('csv', data_files=os.path.join(self.data_path, 'test.csv'))
+        dataset = load_dataset(
+            'csv',
+            data_files={
+                'train': os.path.join(self.data_path, 'train.csv'),
+                'val': os.path.join(self.data_path, 'validation.csv'),
+                'test': os.path.join(self.data_path, 'test.csv'),
+            },
+        )
+        self.train_dataset = dataset['train']
+        self.eval_dataset = dataset['val']
+        self.test_dataset = dataset['test']
 
     def prepare_datasets(self, generate_and_tokenize_prompt):
         tknzd_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
@@ -25,10 +33,7 @@ class DataPreprocessor:
         return tknzd_train_dataset, tknzd_val_dataset
 
     def generate_and_tokenize_prompt(self, data_point, tokenizer):
-        full_prompt = f"""Given a target sentence construct the underlying meaning representation of the input sentence as a single function with attributes and attribute values.
-        This function should describe the target string accurately and the function must be one of the following ['inform', 'request', 'give_opinion', 'confirm', 'verify_attribute', 'suggest', 'request_explanation', 'recommend', 'request_attribute'].
-        The attributes must be one of the following: ['name', 'exp_release_date', 'release_year', 'developer', 'esrb', 'rating', 'genres', 'player_perspective', 'has_multiplayer', 'platforms', 'available_on_steam', 'has_linux_release', 'has_mac_release', 'specifier']
-
+        full_prompt = f"""Given a meaning representation generate a target sentence that utilizes the attributes and attribute values given. The sentence should use all the information provided in the meaning representation.
         ### Target sentence:
         {data_point["ref"]}
 
