@@ -6,7 +6,7 @@ import transformers
 from peft import PeftModel
 
 from helpers import get_quantization_config
-
+from vllm import LLM, SamplingParams
 logger = logging.getLogger(__name__)
 
 
@@ -21,17 +21,24 @@ class ModelInference:
         logger.info('Loading model...')
         model = transformers.AutoModelForCausalLM.from_pretrained(
             model_path,
-            quantization_config=get_quantization_config(),
-            torch_dtype=torch.float16, use_flash_attention_2=True
+            quantization_config=get_quantization_config()
         )
         logger.info('Creating PEFT model...')
         self.ft_model = PeftModel.from_pretrained(model, checkpoint_path).eval()
+        self.llm = LLM(model=model_path)
 
     def generate_response(self, prompt: str, max_tokens: int = 50) -> str:
+        sampling_params = SamplingParams(
+            temperature=0.75,
+            top_p=1,
+            max_tokens=4096,
+            presence_penalty=1.15,
+            skip_special_tokens=True
+        )
         inputs = self.prepare_prompt(prompt)
         with torch.no_grad():
             logger.info('Generating up to %d tokens...', max_tokens)
-            outputs = self.ft_model.generate(**inputs, max_length=max_tokens, pad_token_id=2)
+            outputs = self.llm.generate(**inputs, max_length=max_tokens, pad_token_id=2, sampling_params=sampling_params)
         logger.info('Decoding...')
         return self.postprocess(self.tokenizer.decode(outputs[0], skip_special_tokens=True))
 
