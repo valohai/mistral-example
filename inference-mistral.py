@@ -22,6 +22,7 @@ class ModelInference:
         model = transformers.AutoModelForCausalLM.from_pretrained(
             model_path,
             quantization_config=get_quantization_config(),
+            torch_dtype=torch.float16, use_flash_attention_2=True
         )
         logger.info('Creating PEFT model...')
         self.ft_model = PeftModel.from_pretrained(model, checkpoint_path).eval()
