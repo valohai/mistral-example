@@ -60,7 +60,7 @@ To run your code on Valohai using the terminal, follow these steps:
 
 1. Install Valohai on your machine by running the following command:
 ```bash
-pip install valohai-cli valohai-utils
+pip install valohai-cli
 ```
 
 2. Log in to Valohai from the terminal using the command:
