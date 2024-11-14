@@ -56,7 +56,7 @@ class DataPreprocessor:
         return tokenized_train_dataset, tokenized_val_dataset, self.test_dataset
 
     @staticmethod
-    def save_dataset(dataset, tag='train'):
+    def save_dataset(dataset, tag):
         project_name, exec_id = get_run_identification()
 
         metadata = {
