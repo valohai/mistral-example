@@ -1,4 +1,4 @@
-# Mistral fine-tuning with Valohai
+# Mistral Fine-Tuning with Valohai
 
 This project serves as an on-ramp to [Valohai][vh] and is designed to be the first step for individuals starting with their self-serve trial.
 The primary goal of this template is to showcase the power of Valohai for fine-tuning large language models, with a special focus on the Mistral 7B model.
@@ -19,7 +19,7 @@ When you initiate an execution, the data is automatically stored in the `/valoha
 
 This streamlined workflow empowers you to focus on your machine learning tasks, while Valohai handles data management, versioning, and efficient storage.
 
-### **Model fine-tuning**:
+### **Model Fine-Tuning**:
 * **Loading Data and Model**: The code loads the prepared training data from Valohai datasets. It also fetches the base model from an S3 bucket. This base model is a pre-trained Mistral model.
 
 * **Model Enhancement**: The base model is enhanced to make it better for training with a method called "PEFT." This enhancement involves configuring the model for better training performance.
@@ -28,7 +28,7 @@ This streamlined workflow empowers you to focus on your machine learning tasks, 
 
 Saving Results: After training, the script saves checkpoints of the model's progress. These checkpoints are stored in Valohai datasets for easy access in the next steps, like inference.
 
-### **Model inference**:
+### **Model Inference**:
 
 In the inference step, we use the fine-tuned language model to generate text based on a given prompt. Here's a simplified explanation of what happens in this code:
 
@@ -40,7 +40,7 @@ In the inference step, we use the fine-tuned language model to generate text bas
 
 Login to the [Valohai app][app] and create a new project.
 
-### Configure the repository:
+### Configure the Repository:
 <details open>
 <summary>Using UI</summary>
 
