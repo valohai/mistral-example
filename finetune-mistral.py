@@ -46,13 +46,11 @@ class FineTuner:
         self.accelerator = Accelerator(fsdp_plugin=fsdp_plugin)
 
     def setup_datasets(self):
-        train_path = self.train_data_path or valohai.inputs('train_data').path()
-        val_path = self.val_data_path or valohai.inputs('val_data').path()
+        train_path = self.train_data_path or valohai.inputs('train_data').dir_path()
+        val_path = self.val_data_path or valohai.inputs('val_data').dir_path()
 
-        # use dirname to get /valohai/inputs/train_data from '/valohai/inputs/train_data/train.csv'
-        # TODO(akx): valohai-utils should have an utility to get the dirname of given inputs
-        self.tokenized_train_dataset = datasets.load_from_disk(os.path.dirname(train_path))
-        self.tokenized_eval_dataset = datasets.load_from_disk(os.path.dirname(val_path))
+        self.tokenized_train_dataset = datasets.load_from_disk(train_path)
+        self.tokenized_eval_dataset = datasets.load_from_disk(val_path)
 
     def setup_model(self):
         base_model_id = self.base_mistral_model
