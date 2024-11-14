@@ -123,7 +123,7 @@ vh execution run data-preprocess --adhoc
 
 </details>
 
-## <div align="center">Running Pipeline</div>
+## <div align="center">Running Pipelines</div>
 
 <details open>
 <summary>Using the web app</summary>
