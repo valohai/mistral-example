@@ -94,7 +94,9 @@ Now you are ready to run executions and pipelines.
 
 ## <div align="center">Running Executions</div>
 
-This repository covers essential tasks such as data preprocessing, model fine-tuning and inference using Mistral model.
+This repository defines the essential tasks or "steps" like data preprocessing, model fine-tuning and inference of Mistral models.
+
+You can execute these tasks individually or as part of a pipeline, this section covers how you can run them individually.
 
 <details open>
 <summary>Using the web app</summary>
@@ -124,6 +126,8 @@ vh execution run data-preprocess --adhoc
 </details>
 
 ## <div align="center">Running Pipelines</div>
+
+When you have a collection of tasks that you want to run together, you create a pipeline. This section explains how to run the predefined pipelines in this repository.
 
 <details open>
 <summary>Using the web app</summary>
