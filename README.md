@@ -99,7 +99,7 @@ This repository covers essential tasks such as data preprocessing, model fine-tu
 3. Customize the execution parameters if needed.
 4. Start the execution to run the selected step.
  
- ![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/create_execution.jpeg?raw=true)
+ ![Create execution page on Valohai UI](https://github.com/valohai/mistral-example/blob/main/screenshots/create_execution.jpeg?raw=true)
 
 </details>
 
@@ -129,7 +129,7 @@ vh execution run data-preprocess --adhoc
 4. Configure the pipeline settings.
 5. Create pipeline.
 
-![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/create_pipeline.jpeg?raw=true)
+![Choosing of pipeline blueprint on Valohai UI](https://github.com/valohai/mistral-example/blob/main/screenshots/create_pipeline.jpeg?raw=true)
 
 </details>
 
@@ -150,11 +150,10 @@ vh pipeline run training-pipeline --adhoc
 
 The completed pipeline view:
 
-![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/completed_pipeline.jpeg?raw=true)
-
+![Graph of the completed pipeline on Valohai UI](https://github.com/valohai/mistral-example/blob/main/screenshots/completed_pipeline.jpeg?raw=true)
 
 The generated response by the model looks like this:
 
-![alt text](https://github.com/valohai/mistral-example/blob/main/screenshots/inference_result.jpeg?raw=true)
+![Showcasing the LLM responses inside a Valohai execution](https://github.com/valohai/mistral-example/blob/main/screenshots/inference_result.jpeg?raw=true)
 
 We need to consider that the model underwent only a limited number of fine-tuning steps, so achieving satisfactory results might necessitate further experimentation with model parameters.
