@@ -79,19 +79,17 @@ class DataPreprocessor:
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    parser = argparse.ArgumentParser(description='Prepare data')
 
-    # Add arguments based on your script's needs
+    parser = argparse.ArgumentParser(description='Prepare data')
+    # fmt: off
     parser.add_argument('--data_path', type=str, default=None)
     parser.add_argument('--tokenizer', type=str, default='mistralai/Mistral-7B-v0.1', help='Huggingface tokenizer link')
     parser.add_argument('--model_max_length', type=int, default=512, help='Maximum length for the model')
-
+    # fmt: on
     args = parser.parse_args()
 
     data_preprocessor = DataPreprocessor(args)
-
     tokenized_train_dataset, tokenized_val_dataset, test_dataset = data_preprocessor.load_and_prepare_data()
-
     data_preprocessor.save_dataset(tokenized_train_dataset, 'train')
     data_preprocessor.save_dataset(tokenized_val_dataset, 'val')
     data_preprocessor.save_dataset(test_dataset, 'test')

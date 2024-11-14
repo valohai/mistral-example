@@ -171,9 +171,8 @@ class PrinterCallback(transformers.TrainerCallback):
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    parser = argparse.ArgumentParser(description='Fine-tune a model')
 
-    # Add arguments based on your script's needs
+    parser = argparse.ArgumentParser(description='Fine-tune a model')
     # fmt: off
     parser.add_argument("--base_mistral_model", type=str, default="mistralai/Mistral-7B-v0.1", help="Base mistral from hugging face")
     parser.add_argument("--train_data", type=str, help="Path to the training data")
@@ -185,7 +184,6 @@ def main():
     parser.add_argument("--learning_rate", type=float, default=2.5e-5, help="Learning rate")
     parser.add_argument("--do_eval", action="store_true", help="Perform evaluation at the end of training")
     # fmt: on
-
     args = parser.parse_args()
 
     fine_tuner = FineTuner(args)
