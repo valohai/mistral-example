@@ -34,19 +34,20 @@ class ModelInference:
         self.ft_model = PeftModel.from_pretrained(model, self.checkpoint_path).eval()
 
     def generate_response(self, prompt: str, max_tokens: int = 50) -> str:
-        inputs = self.prepare_prompt(prompt)
+        inputs = self.encode(prompt)
+
         with torch.no_grad():
             logger.info('Generating up to %d tokens...', max_tokens)
             outputs = self.ft_model.generate(**inputs, max_length=max_tokens, pad_token_id=2)
 
-        logger.info('Decoding...')
-        return self.postprocess(self.tokenizer.decode(outputs[0], skip_special_tokens=True))
+        return self.decode(outputs)
 
-    def prepare_prompt(self, prompt):
+    def encode(self, prompt):
         return self.tokenizer(prompt, return_tensors='pt')
 
-    def postprocess(self, original_string):
-        return original_string.strip()
+    def decode(self, model_outputs):
+        text = self.tokenizer.decode(model_outputs[0], skip_special_tokens=True)
+        return text.strip()
 
 
 def run(args):
