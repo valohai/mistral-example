@@ -3,9 +3,9 @@
 This project serves as an on-ramp to [Valohai][vh] and is designed to be the first step for individuals starting with their self-serve trial.
 The primary goal of this template is to showcase the power of Valohai for fine-tuning large language models, with a special focus on the Mistral 7B model.
 
-
 [vh]: https://valohai.com/
 [app]: https://app.valohai.com
+
 ## <div align="center">Steps</div>
 ### **Data Preprocessing**:
 
@@ -38,11 +38,11 @@ In the inference step, we use the fine-tuned language model to generate text bas
 
 ## <div align="center">Installation</div>
 
-Login to the [Valohai app][app] and create a new project.
+Login to [the Valohai web app][app] and create a new project.
 
 ### Configure the Repository:
 <details open>
-<summary>Using UI</summary>
+<summary>Using the web app</summary>
 
 Configure this repository as the project's repository, by following these steps:
 
@@ -54,7 +54,7 @@ Configure this repository as the project's repository, by following these steps:
 </details>
 
 <details open>
-<summary>Using terminal</summary>
+<summary>Using the terminal</summary>
 
 To run your code on Valohai using the terminal, follow these steps:
 
@@ -92,7 +92,7 @@ Now you are ready to run executions and pipelines.
 ## <div align="center">Running Executions</div>
 This repository covers essential tasks such as data preprocessing, model fine-tuning and inference using Mistral model.
 <details open>
-<summary>Using UI</summary>
+<summary>Using the web app</summary>
 
 1. Go to the Executions tab in your project.
 2. Create a new execution by selecting the predefined steps: _data-preprocess_, _finetune_, _inference_.
@@ -104,7 +104,7 @@ This repository covers essential tasks such as data preprocessing, model fine-tu
 </details>
 
 <details open>
-<summary>Using terminal</summary>
+<summary>Using the terminal</summary>
 
 To run individual steps, execute the following command:
 ```bash
@@ -121,7 +121,7 @@ vh execution run data-preprocess --adhoc
 ## <div align="center">Running Pipeline</div>
 
 <details open>
-<summary>Using UI</summary>
+<summary>Using the web app</summary>
 
 1. Navigate to the Pipelines tab.
 2. Create a new pipeline and select out the blueprint _training-pipeline_.
@@ -134,7 +134,7 @@ vh execution run data-preprocess --adhoc
 </details>
 
 <details open>
-<summary>Using terminal</summary>
+<summary>Using the terminal</summary>
 
 To run pipelines, use the following command:
 
