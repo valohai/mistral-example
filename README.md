@@ -7,6 +7,7 @@ The primary goal of this template is to showcase the power of Valohai for fine-t
 [app]: https://app.valohai.com
 
 ## <div align="center">Steps</div>
+
 ### **Data Preprocessing**:
 
 * **Loading Data**:
@@ -20,6 +21,7 @@ When you initiate an execution, the data is automatically stored in the `/valoha
 This streamlined workflow empowers you to focus on your machine learning tasks, while Valohai handles data management, versioning, and efficient storage.
 
 ### **Model Fine-Tuning**:
+
 * **Loading Data and Model**: The code loads the prepared training data from Valohai datasets. It also fetches the base model from an S3 bucket. This base model is a pre-trained Mistral model.
 
 * **Model Enhancement**: The base model is enhanced to make it better for training with a method called "PEFT." This enhancement involves configuring the model for better training performance.
@@ -39,6 +41,7 @@ In the inference step, we use the fine-tuned language model to generate text bas
 ## <div align="center">Installation</div>
 
 ### Configure the Repository:
+
 <details open>
 <summary>Using the web app</summary>
 
@@ -90,7 +93,9 @@ git clone https://github.com/valohai/mistral-example.git .
 Now you are ready to run executions and pipelines.
 
 ## <div align="center">Running Executions</div>
+
 This repository covers essential tasks such as data preprocessing, model fine-tuning and inference using Mistral model.
+
 <details open>
 <summary>Using the web app</summary>
 
