@@ -174,7 +174,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Fine-tune a model')
     # fmt: off
-    parser.add_argument("--base_mistral_model", type=str, default="mistralai/Mistral-7B-v0.1", help="Base mistral from hugging face")
+    parser.add_argument("--base_mistral_model", type=str, default="mistralai/Mistral-7B-v0.1", help="Mistral model path or id from Hugging Face")
     parser.add_argument("--train_data", type=str, help="Path to the training data")
     parser.add_argument("--val_data", type=str, help="Path to the validation data")
     parser.add_argument("--output_dir", type=str, default="finetuned_mistral", help="Output directory for checkpoints")

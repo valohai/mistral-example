@@ -83,7 +83,7 @@ def main():
     parser = argparse.ArgumentParser(description='Prepare data')
     # fmt: off
     parser.add_argument('--data_path', type=str, default=None)
-    parser.add_argument('--tokenizer', type=str, default='mistralai/Mistral-7B-v0.1', help='Huggingface tokenizer link')
+    parser.add_argument('--tokenizer', type=str, default='mistralai/Mistral-7B-v0.1', help='Tokenizer path or id from Hugging Face')
     parser.add_argument('--model_max_length', type=int, default=512, help='Maximum length for the model')
     # fmt: on
     args = parser.parse_args()
