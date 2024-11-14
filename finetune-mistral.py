@@ -108,13 +108,13 @@ class FineTuner:
         self.model = self.accelerator.prepare_model(model)
 
     def train(self):
-        checkpoint_output_dir = valohai.outputs().path(self.output_dir)
+        checkpoints_output_dir = valohai.outputs().path(self.output_dir)
         trainer = transformers.Trainer(
             model=self.model,
             train_dataset=self.tokenized_train_dataset,
             eval_dataset=self.tokenized_eval_dataset,
             args=transformers.TrainingArguments(
-                output_dir=checkpoint_output_dir,
+                output_dir=checkpoints_output_dir,
                 warmup_steps=self.warmup_steps,
                 per_device_train_batch_size=2,
                 gradient_accumulation_steps=4,
@@ -138,15 +138,14 @@ class FineTuner:
 
         self.model.config.use_cache = False  # silence the warnings. Please re-enable for inference!
         trainer.train()
-        model_save_dir = os.path.join(checkpoint_output_dir, 'best_model')
 
-        trainer.save_model(model_save_dir)
+        model_output_dir = os.path.join(checkpoints_output_dir, 'best_model')
+        trainer.save_model(model_output_dir)
 
-        # save metadata
-        self.save_valohai_metadata(model_save_dir)
+        self.save_metadata(model_output_dir)
 
     @staticmethod
-    def save_valohai_metadata(save_dir):
+    def save_metadata(model_output_dir: str):
         project_name, exec_id = helpers.get_run_identification()
 
         metadata = {
@@ -158,8 +157,8 @@ class FineTuner:
                 },
             ],
         }
-        for file in os.listdir(save_dir):
-            md_path = os.path.join(save_dir, f'{file}.metadata.json')
+        for file in os.listdir(model_output_dir):
+            md_path = os.path.join(model_output_dir, f'{file}.metadata.json')
             metadata_path = valohai.outputs().path(md_path)
             with open(metadata_path, 'w') as outfile:
                 json.dump(metadata, outfile)
