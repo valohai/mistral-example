@@ -158,8 +158,7 @@ class FineTuner:
             ],
         }
         for file in os.listdir(model_output_dir):
-            md_path = os.path.join(model_output_dir, f'{file}.metadata.json')
-            metadata_path = valohai.outputs().path(md_path)
+            metadata_path = os.path.join(model_output_dir, f'{file}.metadata.json')
             with open(metadata_path, 'w') as outfile:
                 json.dump(metadata, outfile)
 
