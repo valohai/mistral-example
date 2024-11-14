@@ -34,7 +34,7 @@ In the inference step, we use the fine-tuned language model to generate text bas
 
 * **Loading Model and Checkpoints**: The code loads the base model from an S3 bucket and the fine-tuned checkpoint from the previous step, which is stored in Valohai datasets.
 
-* **Inference** : Using the fine-tuned model and provided test prompt, we obtain a model-generated response, which is decoded by tokenizer to make it human-readable.
+* **Inference**: Using the fine-tuned model and provided test prompt, we obtain a model-generated response, which is decoded by tokenizer to make it human-readable.
 
 ## <div align="center">Installation</div>
 
