@@ -12,7 +12,7 @@ from helpers import get_run_identification
 
 class DataPreprocessor:
     def __init__(self, args):
-        self.data_path = args.data_path or os.path.dirname(valohai.inputs('dataset').path())
+        self.data_path = args.data_path or valohai.inputs('dataset').dir_path()
         self.model_max_length = args.model_max_length
         self.tokenizer = args.tokenizer
         dataset = load_dataset(
