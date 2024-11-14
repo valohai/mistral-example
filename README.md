@@ -165,4 +165,5 @@ The generated response by the model looks like this:
 
 ![Showcasing the LLM responses inside a Valohai execution](https://github.com/valohai/mistral-example/blob/main/screenshots/inference_result.jpeg?raw=true)
 
-We need to consider that the model underwent only a limited number of fine-tuning steps, so achieving satisfactory results might necessitate further experimentation with model parameters.
+> [!IMPORTANT]
+> The example configuration undergoes only a limited number of fine-tuning steps. To achieve satisfactory results might require further experimentation with model parameters.
