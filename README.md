@@ -38,11 +38,11 @@ In the inference step, we use the fine-tuned language model to generate text bas
 
 ## <div align="center">Installation</div>
 
-Login to [the Valohai web app][app] and create a new project.
-
 ### Configure the Repository:
 <details open>
 <summary>Using the web app</summary>
+
+Login to [the Valohai web app][app] and create a new project.
 
 Configure this repository as the project's repository, by following these steps:
 
