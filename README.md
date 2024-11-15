@@ -6,7 +6,7 @@ The primary goal of this template is to showcase the power of Valohai for fine-t
 [vh]: https://valohai.com/
 [app]: https://app.valohai.com
 
-## <div align="center">Steps</div>
+## <div align="center">Overview</div>
 
 ### **Data Preprocessing**:
 
