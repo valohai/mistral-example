@@ -43,7 +43,7 @@ In the inference step, we use the fine-tuned language model to generate text bas
 ### Configure the Repository:
 
 <details>
-<summary>Using the web app</summary>
+<summary>🌐 Using the web app</summary>
 
 Login to [the Valohai web app][app] and create a new project.
 
@@ -57,7 +57,7 @@ Configure this repository as the project's repository, by following these steps:
 </details>
 
 <details>
-<summary>Using the terminal</summary>
+<summary>⌨️ Using the terminal</summary>
 
 To run your code on Valohai using the terminal, follow these steps:
 
@@ -99,7 +99,7 @@ This repository defines the essential tasks or "steps" like data preprocessing, 
 You can execute these tasks individually or as part of a pipeline, this section covers how you can run them individually.
 
 <details>
-<summary>Using the web app</summary>
+<summary>🌐 Using the web app</summary>
 
 1. Go to the Executions tab in your project.
 2. Create a new execution by selecting the predefined steps: _data-preprocess_, _finetune_, _inference_.
@@ -111,7 +111,7 @@ You can execute these tasks individually or as part of a pipeline, this section 
 </details>
 
 <details>
-<summary>Using the terminal</summary>
+<summary>⌨️ Using the terminal</summary>
 
 To run individual steps, execute the following command:
 ```bash
@@ -130,7 +130,7 @@ vh execution run data-preprocess --adhoc
 When you have a collection of tasks that you want to run together, you create a pipeline. This section explains how to run the predefined pipelines in this repository.
 
 <details>
-<summary>Using the web app</summary>
+<summary>🌐 Using the web app</summary>
 
 1. Navigate to the Pipelines tab.
 2. Create a new pipeline and select out the blueprint _training-pipeline_.
@@ -143,7 +143,7 @@ When you have a collection of tasks that you want to run together, you create a 
 </details>
 
 <details>
-<summary>Using the terminal</summary>
+<summary>⌨️ Using the terminal</summary>
 
 To run pipelines, use the following command:
 
