@@ -1,6 +1,6 @@
 - step:
     name: data-preprocess
-    image: valohai/llm-toolkit:0.1
+    image: valohai/llm-toolkit:0.2
     environment: trial2023-g4dn-xlarge
     command:
       - pip install -r requirements.txt
@@ -21,7 +21,7 @@
 
 - step:
     name: finetune
-    image: valohai/llm-toolkit:0.1
+    image: valohai/llm-toolkit:0.2
     environment: trial2023-g4dn-xlarge
     command:
       - pip install -r requirements.txt
@@ -57,7 +57,7 @@
 
 - step:
     name: inference
-    image: valohai/llm-toolkit:0.1
+    image: valohai/llm-toolkit:0.2
     environment: trial2023-g4dn-xlarge
     command:
       - pip install -r requirements.txt
