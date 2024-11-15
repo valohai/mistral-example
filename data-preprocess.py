@@ -33,12 +33,14 @@ class DataPreprocessor:
         return tknzd_train_dataset, tknzd_val_dataset
 
     def generate_and_tokenize_prompt(self, data_point, tokenizer):
-        full_prompt = f"""Given a meaning representation generate a target sentence that utilizes the attributes and attribute values given. The sentence should use all the information provided in the meaning representation.
-        ### Target sentence:
-        {data_point["ref"]}
-
+        full_prompt = f"""
+        Given a meaning representation generate a target sentence that utilizes the attributes and attribute values given. The sentence should use all the information provided in the meaning representation.
+        
         ### Meaning representation:
         {data_point["mr"]}
+        
+        ### Target sentence:
+        {data_point["ref"]}
         """
         return tokenizer(full_prompt, truncation=True, max_length=self.model_max_length, padding='max_length')
 

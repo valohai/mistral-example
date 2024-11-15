@@ -72,6 +72,7 @@
         type: string
         default: "
         Given a meaning representation generate a target sentence that utilizes the attributes and attribute values given. The sentence should use all the information provided in the meaning representation. Below is an example pair. Complete the second pair.
+        
         ### Meaning representation:
         inform(name[Need for Speed: Payback], release_year[2017], genres[driving/racing], player_perspective[third person], has_multiplayer[yes], platforms[PlayStation, Xbox, PC], has_linux_release[no], has_mac_release[no])
         
