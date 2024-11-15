@@ -5,6 +5,8 @@ The primary goal of this template is to showcase the power of Valohai for fine-t
 
 [vh]: https://valohai.com/
 [app]: https://app.valohai.com
+[hf_login]: https://huggingface.co/login
+[hf_mistral]: https://huggingface.co/mistralai/Mistral-7B-v0.1
 
 ## <div align="center">Overview</div>
 
@@ -90,13 +92,40 @@ git clone https://github.com/valohai/mistral-example.git .
 
 </details>
 
-Now you are ready to run executions and pipelines.
+<details>
+<summary>🌐 / ⌨️ Setup for both</summary>
+
+Authorize the Valohai project to download models and tokenizers from Hugging Face.
+
+1. Login to [the Hugging Face platform][hf_login]
+
+2. Agree on [the terms of Mistral model][hf_mistral]; the license is Apache 2.
+
+    ![Agree to the terms set by Mistral to use their models](https://github.com/valohai/mistral-example/blob/main/screenshots/hf_agree_to_terms.png?raw=true)
+
+3. Create an access token under Hugging Face settings.
+
+    ![Access token controls under Hugging Face settings](https://github.com/valohai/mistral-example/blob/main/screenshots/hf_access_token_page.png?raw=true)
+
+    ![Access token creation form under Hugging Face settings](https://github.com/valohai/mistral-example/blob/main/screenshots/hf_create_token.png?raw=true)
+
+    _You can either choose to allow access to all public models you've agreed to or only the Mistral model._
+
+    Copy the token and store it in a secure place, you won't be seeing it again.
+
+    ![Copy the token for later use](https://github.com/valohai/mistral-example/blob/main/screenshots/hf_get_token.png?raw=true)
+
+4. Add the `hf_xxx` token to your Valohai project as a secret named `HF_TOKEN`.
+
+    ![Valohai project environmental variable configuration page](https://github.com/valohai/mistral-example/blob/main/screenshots/vh_project_env_vars.png?raw=true)
+
+    Now all workloads on this project have scoped access to Hugging Face if you don't specifically restrict them.
+
+</details>
 
 ## <div align="center">Running Executions</div>
 
-This repository defines the essential tasks or "steps" like data preprocessing, model fine-tuning and inference of Mistral models.
-
-You can execute these tasks individually or as part of a pipeline, this section covers how you can run them individually.
+This repository defines the essential tasks or "steps" like data preprocessing, model fine-tuning and inference of Mistral models. You can execute these tasks individually or as part of a pipeline. This section covers how you can run them individually.
 
 <details>
 <summary>🌐 Using the web app</summary>
