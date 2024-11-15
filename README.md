@@ -40,9 +40,9 @@ In the inference step, we use the fine-tuned language model to generate text bas
 
 * **Inference**: Using the fine-tuned model and provided test prompt, we get a model-generated response, which tokenizer decodes to make it human-readable.
 
-## <div align="center">Installation</div>
+## <div align="center">Setup</div>
 
-### Configure the Repository:
+Before we can run any code, we need to set up the project. This section explains how to set up the project using the Valohai web app or the terminal.
 
 <details>
 <summary>🌐 Using the web app</summary>
