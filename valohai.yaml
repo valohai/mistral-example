@@ -3,7 +3,7 @@
     image: valohai/llm-toolkit:0.1
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.in
+      - pip install -r requirements.txt
       - python data-preprocess.py {parameters}
     parameters:
       - name: tokenizer
@@ -24,7 +24,7 @@
     image: valohai/llm-toolkit:0.1
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.in
+      - pip install -r requirements.txt
       - python finetune-mistral.py {parameters}
     parameters:
       - name: base_mistral_model
@@ -60,7 +60,7 @@
     image: valohai/llm-toolkit:0.1
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.in
+      - pip install -r requirements.txt
       - python inference-mistral.py {parameters}
     parameters:
       - name: base_mistral_model
