@@ -1,9 +1,9 @@
 - step:
     name: data-preprocess
-    image: valohai/llm-toolkit:0.2
+    image: valohai/llm-toolkit:0.2-gpu
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.txt
+      - pip install -r requirements-gpu.txt
       - python data-preprocess.py {parameters}
     parameters:
       - name: tokenizer
@@ -21,10 +21,10 @@
 
 - step:
     name: finetune
-    image: valohai/llm-toolkit:0.2
+    image: valohai/llm-toolkit:0.2-gpu
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.txt
+      - pip install -r requirements-gpu.txt
       - python finetune-mistral.py {parameters}
     parameters:
       - name: base_mistral_model
@@ -57,10 +57,10 @@
 
 - step:
     name: inference
-    image: valohai/llm-toolkit:0.2
+    image: valohai/llm-toolkit:0.2-gpu
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.txt
+      - pip install -r requirements-gpu.txt
       - python inference-mistral.py {parameters}
     parameters:
       - name: base_mistral_model

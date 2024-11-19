@@ -1,0 +1,14 @@
+FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_ROOT_USER_ACTION=ignore
+
+WORKDIR /workspace
+
+COPY requirements-gpu.txt .
+
+RUN pip install \
+    --no-cache-dir \
+    -r requirements-gpu.txt \
+    && rm requirements-gpu.txt
