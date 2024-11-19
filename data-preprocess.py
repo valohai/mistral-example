@@ -5,16 +5,15 @@ import os
 
 import valohai
 from datasets import load_dataset
-from transformers import AutoTokenizer
 
-from helpers import get_run_identification
+from helpers import get_run_identification, get_tokenizer, promptify
 
 
 class DataPreprocessor:
     def __init__(self, args):
         self.data_path = args.data_path or valohai.inputs('dataset').dir_path()
-        self.model_max_length = args.model_max_length
-        self.tokenizer = args.tokenizer
+        self.model_id = args.model_id
+        self.max_tokens = args.max_tokens
         dataset = load_dataset(
             'csv',
             data_files={
@@ -33,25 +32,11 @@ class DataPreprocessor:
         return tknzd_train_dataset, tknzd_val_dataset
 
     def generate_and_tokenize_prompt(self, data_point, tokenizer):
-        full_prompt = f"""
-        Given a meaning representation generate a target sentence that utilizes the attributes and attribute values given. The sentence should use all the information provided in the meaning representation.
-        
-        ### Meaning representation:
-        {data_point["mr"]}
-        
-        ### Target sentence:
-        {data_point["ref"]}
-        """
-        return tokenizer(full_prompt, truncation=True, max_length=self.model_max_length, padding='max_length')
+        prompt = promptify(sentence=data_point['ref'], meaning=data_point['mr'])
+        return tokenizer(prompt, truncation=True, max_length=self.max_tokens)
 
     def load_and_prepare_data(self):
-        tokenizer = AutoTokenizer.from_pretrained(
-            self.tokenizer,
-            model_max_length=self.model_max_length,
-            padding_side='left',
-            add_eos_token=True,
-        )
-        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer = get_tokenizer(self.model_id, self.max_tokens)
         tokenized_train_dataset, tokenized_val_dataset = self.prepare_datasets(
             lambda data_point: self.generate_and_tokenize_prompt(data_point, tokenizer),
         )
@@ -85,8 +70,8 @@ def main():
     parser = argparse.ArgumentParser(description='Prepare data')
     # fmt: off
     parser.add_argument('--data_path', type=str, default=None)
-    parser.add_argument('--tokenizer', type=str, default='mistralai/Mistral-7B-v0.1', help='Tokenizer path or id from Hugging Face')
-    parser.add_argument('--model_max_length', type=int, default=512, help='Maximum length for the model')
+    parser.add_argument('--model_id', type=str, default="mistralai/Mistral-7B-v0.1", help="Model identifier from Hugging Face, also defines the tokenizer")
+    parser.add_argument('--max_tokens', type=int, default=512, help="The maximum number of tokens that the model can process in a single forward pass")
     # fmt: on
     args = parser.parse_args()
 
