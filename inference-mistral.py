@@ -51,12 +51,16 @@ class ModelInference:
 
 
 def run(args):
+    prompt = valohai.parameters('prompt', args.prompt).value
+    if not prompt:
+        raise ValueError('--prompt argument is required when running outside of Valohai')
+
     inference = ModelInference(
         base_mistral_model=args.base_mistral_model,
         checkpoint_path=args.checkpoint_path,
     )
     response = inference.generate_response(
-        prompt=args.prompt,
+        prompt=prompt,
         max_tokens=args.max_tokens,
     )
     print('Generated Response:')
@@ -71,7 +75,7 @@ def main():
     parser.add_argument('--base_mistral_model', type=str, default='mistralai/Mistral-7B-v0.1', help='Mistral model path or id from Hugging Face')
     parser.add_argument('--checkpoint_path', type=str)
     parser.add_argument('--max_tokens', type=int, default=305, help='Maximum number of tokens in response')
-    parser.add_argument('--prompt', type=str, required=True, help='Input prompt for text generation')
+    parser.add_argument('--prompt', type=str, help='Input prompt for text generation')
     # fmt: on
     args = parser.parse_args()
 
