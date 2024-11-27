@@ -105,23 +105,23 @@ Authorize the Valohai project to download models and tokenizers from Hugging Fac
 
 2. Agree on [the terms of Mistral model][hf_mistral]; the license is Apache 2.
 
-    ![Agree to the terms set by Mistral to use their models](screenshots/hf_agree_to_terms.png)
+    ![Agree to the terms set by Mistral to use their models](.github/screenshots/hf_agree_to_terms.png)
 
 3. Create an access token under Hugging Face settings.
 
-    ![Access token controls under Hugging Face settings](screenshots/hf_access_token_page.png)
+    ![Access token controls under Hugging Face settings](.github/screenshots/hf_access_token_page.png)
 
-    ![Access token creation form under Hugging Face settings](screenshots/hf_create_token.png)
+    ![Access token creation form under Hugging Face settings](.github/screenshots/hf_create_token.png)
 
     _You can either choose to allow access to all public models you've agreed to or only the Mistral model._
 
     Copy the token and store it in a secure place, you won't be seeing it again.
 
-    ![Copy the token for later use](screenshots/hf_get_token.png)
+    ![Copy the token for later use](.github/screenshots/hf_get_token.png)
 
 4. Add the `hf_xxx` token to your Valohai project as a secret named `HF_TOKEN`.
 
-    ![Valohai project environmental variable configuration page](screenshots/vh_project_env_vars.png)
+    ![Valohai project environmental variable configuration page](.github/screenshots/vh_project_env_vars.png)
 
     Now all workloads on this project have scoped access to Hugging Face if you don't specifically restrict them.
 
@@ -139,7 +139,7 @@ This repository defines the essential tasks or "steps" like data preprocessing, 
 3. Customize the execution parameters if needed.
 4. Start the execution to run the selected step.
  
-     ![Create execution page on Valohai UI](screenshots/create_execution.jpeg)
+     ![Create execution page on Valohai UI](.github/screenshots/create_execution.jpeg)
 
 </details>
 
@@ -171,7 +171,7 @@ When you have a collection of tasks that you want to run together, you create a 
 4. Configure the pipeline settings.
 5. Create pipeline.
 
-    ![Choosing of pipeline blueprint on Valohai UI](screenshots/create_pipeline.jpeg)
+    ![Choosing of pipeline blueprint on Valohai UI](.github/screenshots/create_pipeline.jpeg)
 
 </details>
 
@@ -192,11 +192,11 @@ vh pipeline run training-pipeline --adhoc
 
 The completed pipeline view:
 
-![Graph of the completed pipeline on Valohai UI](screenshots/completed_pipeline.jpeg)
+![Graph of the completed pipeline on Valohai UI](.github/screenshots/completed_pipeline.jpeg)
 
 The generated response by the model looks like this:
 
-![Showcasing the LLM responses inside a Valohai execution](screenshots/inference_result.jpeg)
+![Showcasing the LLM responses inside a Valohai execution](.github/screenshots/inference_result.jpeg)
 
 > [!IMPORTANT]
 > The example configuration undergoes only a limited number of fine-tuning steps. To achieve satisfactory results might require further experimentation with model parameters.
