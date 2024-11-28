@@ -3,6 +3,6 @@ bitsandbytes
 datasets
 peft
 sentencepiece
-torch>=1.10
+torch
 transformers
 valohai-utils

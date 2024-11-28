@@ -1,15 +1,15 @@
 - step:
     name: data-preprocess
-    image: valohai/llm-toolkit:0.1
+    image: valohai/llm-toolkit:0.2-gpu
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.in
+      - pip install -r requirements-gpu.txt
       - python data-preprocess.py {parameters}
     parameters:
-      - name: tokenizer
+      - name: model_id
         type: string
         default: 'mistralai/Mistral-7B-v0.1'
-      - name: model_max_length
+      - name: max_tokens
         type: integer
         default: 512
     inputs:
@@ -21,26 +21,27 @@
 
 - step:
     name: finetune
-    image: valohai/llm-toolkit:0.1
+    image: valohai/llm-toolkit:0.2-gpu
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.in
+      - pip install -r requirements-gpu.txt
       - python finetune-mistral.py {parameters}
     parameters:
-      - name: base_mistral_model
+      - name: model_id
+        type: string
         default: "mistralai/Mistral-7B-v0.1"
+      - name: max_tokens
+        type: integer
+        default: 512
       - name: output_dir
         type: string
         default: "finetuned_mistral"
-      - name: model_max_length
-        type: integer
-        default: 512
       - name: warmup_steps
         type: integer
         default: 5
       - name: max_steps
         type: integer
-        default: 36
+        default: 30
       - name: learning_rate
         type: float
         default: 2.5e-5
@@ -57,32 +58,21 @@
 
 - step:
     name: inference
-    image: valohai/llm-toolkit:0.1
+    image: valohai/llm-toolkit:0.2-gpu
     environment: trial2023-g4dn-xlarge
     command:
-      - pip install -r requirements.in
+      - pip install -r requirements-gpu.txt
       - python inference-mistral.py {parameters}
     parameters:
-      - name: base_mistral_model
+      - name: model_id
+        type: string
         default: "mistralai/Mistral-7B-v0.1"
       - name: max_tokens
         type: integer
-        default: 500
-      - name: prompt
+        default: 512
+      - name: sentence
         type: string
-        default: "
-        Given a meaning representation generate a target sentence that utilizes the attributes and attribute values given. The sentence should use all the information provided in the meaning representation. Below is an example pair. Complete the second pair.
-        ### Meaning representation:
-        inform(name[Need for Speed: Payback], release_year[2017], genres[driving/racing], player_perspective[third person], has_multiplayer[yes], platforms[PlayStation, Xbox, PC], has_linux_release[no], has_mac_release[no])
-        
-        ### Target sentence: 
-        Need for Speed: Payback is a third person driving/racing game with a multiplayer mode. It came out in 2017 for PlayStation, Xbox, and PC, but it is not available on Mac or Linux.
-        
-        ### Meaning representation:
-        inform(name[Made Up Game], release_year[2023], rating[good], genres[arcade, puzzle], has_multiplayer[no], available_on_steam[yes])
-
-        ### Target sentence:
-        "
+        default: Satisfactory is a 2024 game developed by Coffee Stain Studios. It is a great game about building factories on an alien planet.
     inputs:
       - name: finetuned-checkpoint
         default: dataset://mistral-models/best_mistral_checkpoint
@@ -104,6 +94,7 @@
       - [preprocess.output.encoded_train/*, train.input.train_data]
       - [preprocess.output.encoded_test/*, train.input.test_data]
       - [train.output.finetuned_mistral.best_model/*, inference.input.finetuned-checkpoint]
-      - [train.parameter.base_mistral_model, inference.parameter.base_mistral_model]
-
-
+      - [preprocess.parameter.max_tokens, train.parameter.max_tokens]
+      - [train.parameter.max_tokens, inference.parameter.max_tokens]
+      - [preprocess.parameter.model_id, train.parameter.model_id]
+      - [train.parameter.model_id, inference.parameter.model_id]
