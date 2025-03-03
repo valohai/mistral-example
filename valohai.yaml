@@ -98,3 +98,16 @@
       - [train.parameter.max_tokens, inference.parameter.max_tokens]
       - [preprocess.parameter.model_id, train.parameter.model_id]
       - [train.parameter.model_id, inference.parameter.model_id]
+
+- endpoint:
+    name: mistral-inference
+    description: Run inference using the fine-tuned Mistral model
+    image: valohai/llm-toolkit:0.2-gpu
+    wsgi: predict:predict
+    files:
+      - name: adapter_config
+        description: Adapter configuration file for fine-tuned Mistral
+        path: finetuned_mistral/best_model/adapter_config.json
+      - name: adapter_model
+        description: Fine-tuned Mistral adapter model
+        path: finetuned_mistral/best_model/adapter_model.bin
