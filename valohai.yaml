@@ -107,10 +107,10 @@
     files:
       - name: adapter_config
         description: Adapter configuration file for fine-tuned Mistral
-        path: finetuned_mistral/best_model/adapter_config.json
+        path: adapter_config.json
       - name: adapter_model
         description: Fine-tuned Mistral adapter model
-        path: finetuned_mistral/best_model/adapter_model.bin
+        path: adapter_model.safetensors
 
 - pipeline:
     name: training-pipeline-w-deployment
@@ -141,5 +141,5 @@
       - [train.parameter.max_tokens, inference.parameter.max_tokens]
       - [preprocess.parameter.model_id, train.parameter.model_id]
       - [train.parameter.model_id, inference.parameter.model_id]
-      - [train.output.finetuned_mistral.best_model.adapter_config.json, deploy.file.mistral-inference.adapter_config]
-      - [train.output.finetuned_mistral.best_model.adapter_model.bin, deploy.file.mistral-inference.adapter_model]
+      - [train.output.finetuned_mistral/best_model/adapter_config.json, deploy.file.mistral-inference.adapter_config]
+      - [train.output.finetuned_mistral/best_model/adapter_model.safetensors, deploy.file.mistral-inference.adapter_model]
