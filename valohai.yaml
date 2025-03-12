@@ -93,8 +93,53 @@
       - [preprocess.output.encoded_val/*, train.input.val_data]
       - [preprocess.output.encoded_train/*, train.input.train_data]
       - [preprocess.output.encoded_test/*, train.input.test_data]
-      - [train.output.finetuned_mistral.best_model/*, inference.input.finetuned-checkpoint]
+      - [train.output.finetuned_mistral/best_model/*, inference.input.finetuned-checkpoint]
       - [preprocess.parameter.max_tokens, train.parameter.max_tokens]
       - [train.parameter.max_tokens, inference.parameter.max_tokens]
       - [preprocess.parameter.model_id, train.parameter.model_id]
       - [train.parameter.model_id, inference.parameter.model_id]
+
+- endpoint:
+    name: mistral-inference
+    description: Run inference using the fine-tuned Mistral model
+    image: valohai/llm-toolkit:0.2-gpu
+    wsgi: predict:predict
+    files:
+      - name: adapter_config
+        description: Adapter configuration file for fine-tuned Mistral
+        path: adapter_config.json
+      - name: adapter_model
+        description: Fine-tuned Mistral adapter model
+        path: adapter_model.safetensors
+
+- pipeline:
+    name: training-pipeline-w-deployment
+    nodes:
+      - name: preprocess
+        type: execution
+        step: data-preprocess
+      - name: train
+        type: execution
+        step: finetune
+      - name: inference
+        type: execution
+        step: inference
+      - name: deploy
+        type: deployment
+        deployment: deploy-llm
+        endpoints:
+          - mistral-inference
+        actions:
+          - when: node-starting
+            then: require-approval
+    edges:
+      - [preprocess.output.encoded_val/*, train.input.val_data]
+      - [preprocess.output.encoded_train/*, train.input.train_data]
+      - [preprocess.output.encoded_test/*, train.input.test_data]
+      - [train.output.finetuned_mistral/best_model/*, inference.input.finetuned-checkpoint]
+      - [preprocess.parameter.max_tokens, train.parameter.max_tokens]
+      - [train.parameter.max_tokens, inference.parameter.max_tokens]
+      - [preprocess.parameter.model_id, train.parameter.model_id]
+      - [train.parameter.model_id, inference.parameter.model_id]
+      - [train.output.finetuned_mistral/best_model/adapter_config.json, deploy.file.mistral-inference.adapter_config]
+      - [train.output.finetuned_mistral/best_model/adapter_model.safetensors, deploy.file.mistral-inference.adapter_model]
