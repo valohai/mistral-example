@@ -8,12 +8,12 @@ on:
 
 jobs:
   Lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - uses: pre-commit/action@v3.0.0
+          python-version: "3.13"
+      - uses: pre-commit/action@v3.0.1
         env:
           RUFF_OUTPUT_FORMAT: github
