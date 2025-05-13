@@ -37,8 +37,8 @@ class ModelInference:
 
         try:
             meaning = response.split('### Meaning representation:')[1].split('\n')[1]
-        except IndexError:
-            raise ValueError(f'Failed to extract meaning from response: {response}')
+        except IndexError as ie:
+            raise ValueError(f'Failed to extract meaning from response: {response}') from ie
 
         return meaning
 
